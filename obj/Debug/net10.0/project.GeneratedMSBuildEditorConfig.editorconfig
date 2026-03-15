@@ -22,14 +22,17 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = project
-build_property.ProjectDir = C:\Users\Barna\Desktop\semester_project\
+build_property.ProjectDir = C:\Users\asent\Documents\Git\test\Project-Group-13\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/Barna/Desktop/semester_project/App.axaml]
+[C:/Users/asent/Documents/Git/test/Project-Group-13/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/Barna/Desktop/semester_project/Views/MainWindow.axaml]
+[C:/Users/asent/Documents/Git/test/Project-Group-13/Styles/Theme.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/asent/Documents/Git/test/Project-Group-13/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

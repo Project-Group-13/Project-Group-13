@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Barna\\Desktop\\semester_project\\project.csproj": {}
+    "C:\\Users\\asent\\Documents\\Git\\test\\Project-Group-13\\project.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Barna\\Desktop\\semester_project\\project.csproj": {
+    "C:\\Users\\asent\\Documents\\Git\\test\\Project-Group-13\\project.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Barna\\Desktop\\semester_project\\project.csproj",
+        "projectUniqueName": "C:\\Users\\asent\\Documents\\Git\\test\\Project-Group-13\\project.csproj",
         "projectName": "project",
-        "projectPath": "C:\\Users\\Barna\\Desktop\\semester_project\\project.csproj",
-        "packagesPath": "C:\\Users\\Barna\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Barna\\Desktop\\semester_project\\obj\\",
+        "projectPath": "C:\\Users\\asent\\Documents\\Git\\test\\Project-Group-13\\project.csproj",
+        "packagesPath": "C:\\Users\\asent\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\asent\\Documents\\Git\\test\\Project-Group-13\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Barna\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\asent\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -67,6 +73,10 @@
             "CommunityToolkit.Mvvm": {
               "target": "Package",
               "version": "[8.4.0, )"
+            },
+            "LiveChartsCore.SkiaSharpView.Avalonia": {
+              "target": "Package",
+              "version": "[2.0.0-rc6.1, )"
             }
           },
           "imports": [
@@ -85,7 +95,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

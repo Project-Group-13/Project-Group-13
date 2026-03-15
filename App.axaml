@@ -10,5 +10,6 @@
   
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://project/Styles/Theme.axaml" />
     </Application.Styles>
 </Application>

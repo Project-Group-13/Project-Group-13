@@ -3,61 +3,101 @@
         xmlns:vm="using:project.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
         x:Class="project.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="HeatItOn Optimization System"
-        x:CompileBindings="False"> <Design.DataContext>
+        Title="Heat Optimization Scheduler"
+        Background="#F4F4F7"
+        x:CompileBindings="False">
+    <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TabControl>
-        <TabItem Header="Units">
-            <StackPanel Margin="20" Spacing="10">
-                <StackPanel.DataContext>
-                    <vm:UnitsViewModel/>
-                </StackPanel.DataContext>
 
-                <TextBlock Text="Production Unit Information" FontSize="15" FontWeight="Bold"/>
 
-                <TextBlock Text="Select a Unit:"/>
-                <ComboBox ItemsSource="{Binding AllUnits}" 
-                          SelectedItem="{Binding SelectedUnit}"
-                          Width="250">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                <Separator Margin="0,10"/>
+        <!-- Top header bar -->
+        <Border Grid.Row="0" Background="#D0021B" Padding="16" >
+            <DockPanel LastChildFill="True">
+                <TextBlock Text="Heat Optimization Scheduler" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+            </DockPanel>
+        </Border>
 
-                <StackPanel Spacing="5" IsVisible="{Binding SelectedUnit, Converter={x:Static ObjectConverters.IsNotNull}}">
-                    <TextBlock Text="Szstem" FontWeight="Bold" Foreground="Blue"/>
-                    
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Name: " FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding SelectedUnit.Name}"/>
-                    </StackPanel>
+        <!-- Main content -->
+        <ScrollViewer Grid.Row="1" Padding="20" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <Border Background="White" CornerRadius="14" Padding="20">
+                <TabControl>
+                    <TabItem Header="Dashboard">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Dashboard" FontSize="20" FontWeight="Bold"/>
+                            <TextBlock Text="The optimization dashboard will be implemented here."/>
+                        </StackPanel>
+                    </TabItem>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Max Heat: " FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding SelectedUnit.MaxHeat}"/>
-                        <TextBlock Text=" MW"/>
-                    </StackPanel>
+                    <TabItem Header="Graphs">
+                        <StackPanel Margin="0" Spacing="16" DataContext="{Binding GraphsVM}">
+                            <TextBlock Text="Graph view" FontSize="20" FontWeight="Bold"/>
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <TextBlock Text="Select a graph:" VerticalAlignment="Center"/>
+                                <ComboBox ItemsSource="{Binding GraphOptions}" 
+                                          SelectedItem="{Binding SelectedGraph}"
+                                          Width="260"
+                                          HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <lvc:CartesianChart Series="{Binding Series}" 
+                                                XAxes="{Binding XAxes}" 
+                                                YAxes="{Binding YAxes}" 
+                                                Title="{Binding ChartTitle}"
+                                                LegendTextPaint="#111111"
+                                                LegendBackgroundPaint="#00FFFFFF"
+                                                Background="White"
+                                                Height="360"/>
+                        </StackPanel>
+                    </TabItem>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Production Cost: " FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding SelectedUnit.ProductionCost}"/>
-                        <TextBlock Text=" DKK/MWh"/>
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
-        </TabItem>
-
-        <TabItem Header="Optimization">
-            <TextBlock Text="The optimization dashboard will be implemented here." Margin="20"/>
-        </TabItem>
-    </TabControl>
+                    <TabItem Header="Units">
+                        <StackPanel Margin="0" Spacing="16">
+                            <TextBlock Text="Production Unit Information" FontSize="20" FontWeight="Bold"/>
+                            <StackPanel DataContext="{Binding UnitsViewModel}" Spacing="12">
+                                <TextBlock Text="Select a Unit:"/>
+                                <ComboBox ItemsSource="{Binding AllUnits}" 
+                                          SelectedItem="{Binding SelectedUnit}"
+                                          Width="260">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Separator/>
+                                <StackPanel Spacing="10" IsVisible="{Binding SelectedUnit, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <TextBlock Text="Unit Details" FontWeight="Bold" Foreground="#D0021B"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Name:" FontWeight="SemiBold" Width="140"/>
+                                        <TextBlock Text="{Binding SelectedUnit.Name}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Max Heat:" FontWeight="SemiBold" Width="140"/>
+                                        <TextBlock Text="{Binding SelectedUnit.MaxHeat}"/>
+                                        <TextBlock Text="MW"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Production Cost:" FontWeight="SemiBold" Width="140"/>
+                                        <TextBlock Text="{Binding SelectedUnit.ProductionCost}"/>
+                                        <TextBlock Text="DKK/MWh"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </ScrollViewer>
+    </Grid>
 </Window>
