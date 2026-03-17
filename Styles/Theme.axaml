@@ -29,23 +29,39 @@
     <Setter Property="Background" Value="#F2F2F6"/>
     <Setter Property="Foreground" Value="#111"/>
     <Setter Property="BorderBrush" Value="#D0D0D8"/>
-    <Setter Property="BorderThickness" Value="1"/>
     <Setter Property="CornerRadius" Value="8"/>
+
+    <Style Selector="^:focus">
+      <Setter Property="Background" Value="#cccccc"/>
+    </Style>
+
+    <Style Selector="^:focus-within">
+      <Setter Property="Background" Value="#cccccc"/>
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Border">
+      <Setter Property="Background" Value="#cccccc"/>  
+    </Style>
+  </Style>
+
+  <Style Selector="ComboBox /template/ Border#PopupBorder">
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
   </Style>
 
   <Style Selector="ComboBoxItem">
     <Setter Property="Background" Value="#FFFFFF"/>
     <Setter Property="Foreground" Value="#111"/>
     <Setter Property="Padding" Value="8,4"/>
-  </Style>
 
-  <Style Selector="ComboBoxItem:pointerover">
-    <Setter Property="Background" Value="#E5E5EA"/>
-  </Style>
+    <Style Selector="^:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#cccccc"/>  
+    </Style>
 
-  <Style Selector="ComboBoxItem:selected">
-    <Setter Property="Background" Value="#DDE0E9"/>
-    <Setter Property="Foreground" Value="#111"/>
+    <Style Selector="^:selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="#ffb6b6"/>
+      <Setter Property="Foreground" Value="#111"/>
+    </Style>
   </Style>
 
   <!-- Tabs -->
@@ -53,20 +69,42 @@
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="BorderThickness" Value="0"/>
   </Style>
+  
 
   <Style Selector="TabItem">
     <Setter Property="Background" Value="#F7F7F8"/>
     <Setter Property="Foreground" Value="#222"/>
+    <Setter Property="BorderBrush" Value="#000000"/>
+    <Setter Property="BorderThickness" Value="1"/>
     <Setter Property="Padding" Value="14,8"/>
     <Setter Property="Margin" Value="0,0,8,0"/>
     <Setter Property="CornerRadius" Value="12"/>
-  </Style>
 
-  <Style Selector="TabItem:selected">
-    <Setter Property="Background" Value="#FFFFFF"/>
-    <Setter Property="BorderBrush" Value="#E0E0E3"/>
-    <Setter Property="BorderThickness" Value="1"/>
-    <Setter Property="Foreground" Value="#111"/>
-  </Style>
+    <Style Selector="^:selected">
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="TextBlock.Foreground" Value="#111"/>
+    </Style>
 
+    <Style Selector="^:pointerover /template/ ContentPresenter">
+      <Setter Property="TextBlock.Foreground" Value="#111"/>
+    </Style>
+
+    <Style Selector="^:selected:pointerover /template/ ContentPresenter">
+        <Setter Property="TextBlock.Foreground" Value="#111"/>
+    </Style>
+
+    <Style Selector="^:focus">
+      <Setter Property="Background" Value="#ffffff"/>
+      <Setter Property="BorderBrush" Value="#000000"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="TextBlock.Foreground" Value="#111"/>
+    </Style>
+
+    <Style Selector="^:focus-within">
+      <Setter Property="Background" Value="#ffffff"/>
+      <Setter Property="BorderBrush" Value="#000000"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="TextBlock.Foreground" Value="#111"/>
+    </Style>
+  </Style>
 </Styles>
