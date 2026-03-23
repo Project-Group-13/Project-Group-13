@@ -4,10 +4,10 @@ using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
-using Heat_Production_Optimization.ViewModels;
-using Heat_Production_Optimization.Views;
+using project.ViewModels;
+using project.Views;
 
-namespace Heat_Production_Optimization;
+namespace project;
 
 public partial class App : Application
 {
@@ -20,8 +20,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-            // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
+            
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
@@ -33,12 +32,9 @@ public partial class App : Application
     }
 
     private void DisableAvaloniaDataAnnotationValidation()
-    {
-        // Get an array of plugins to remove
-        var dataValidationPluginsToRemove =
+    {        var dataValidationPluginsToRemove =
             BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
 
-        // remove each entry found
         foreach (var plugin in dataValidationPluginsToRemove)
         {
             BindingPlugins.DataValidators.Remove(plugin);
