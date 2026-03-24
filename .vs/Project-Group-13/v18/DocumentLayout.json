@@ -45,21 +45,19 @@
               "ToolTip": "C:\\Users\\gerga\\Documents\\GitHub\\Project-Group-13\\Heat Production Optimization\\App.axaml",
               "RelativeToolTip": "Heat Production Optimization\\App.axaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-03-24T12:45:23.897Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-24T12:45:23.897Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "Heat Production Optimization",
+              "Title": "Heat Production Optimization.csproj",
               "DocumentMoniker": "C:\\Users\\gerga\\Documents\\GitHub\\Project-Group-13\\Heat Production Optimization\\Heat Production Optimization.csproj",
               "RelativeDocumentMoniker": "Heat Production Optimization\\Heat Production Optimization.csproj",
               "ToolTip": "C:\\Users\\gerga\\Documents\\GitHub\\Project-Group-13\\Heat Production Optimization\\Heat Production Optimization.csproj",
               "RelativeToolTip": "Heat Production Optimization\\Heat Production Optimization.csproj",
               "ViewState": "AgIAAAoAAAAAAAAAAAAUwBEAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-24T12:42:33.915Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-24T12:42:33.915Z"
             },
             {
               "$type": "Document",
@@ -70,8 +68,7 @@
               "ToolTip": "C:\\Users\\gerga\\Documents\\GitHub\\Project-Group-13\\Heat Production Optimization\\Views\\MainWindow.axaml",
               "RelativeToolTip": "Heat Production Optimization\\Views\\MainWindow.axaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-03-24T11:29:33.955Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-24T11:29:33.955Z"
             },
             {
               "$type": "Document",
@@ -83,8 +80,7 @@
               "RelativeToolTip": "Heat Production Optimization\\Views\\MainWindow.axaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-24T11:05:03.739Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-24T11:05:03.739Z"
             },
             {
               "$type": "Document",
@@ -94,7 +90,7 @@
               "RelativeDocumentMoniker": "Heat Production Optimization\\ViewModels\\GraphsViewModel.cs",
               "ToolTip": "C:\\Users\\gerga\\Documents\\GitHub\\Project-Group-13\\Heat Production Optimization\\ViewModels\\GraphsViewModel.cs",
               "RelativeToolTip": "Heat Production Optimization\\ViewModels\\GraphsViewModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAYAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAA4wBMAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-24T10:57:19.514Z",
               "EditorCaption": ""
