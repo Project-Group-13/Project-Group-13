@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using project.Models; 
-namespace project.ViewModels;
+using Heat_Production_Optimization.Models; 
+namespace Heat_Production_Optimization.ViewModels;
 
 public partial class UnitsViewModel : ViewModelBase
 {

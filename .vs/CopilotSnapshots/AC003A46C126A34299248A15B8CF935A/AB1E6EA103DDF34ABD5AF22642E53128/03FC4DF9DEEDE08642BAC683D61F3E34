@@ -1,16 +1,16 @@
-<Application xmlns="https://github.com/avaloniaui"
+﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Heat_Production_Optimization.App"
-             xmlns:local="using:Heat_Production_Optimization"
+             xmlns:local="using:project"
              xmlns:heatProductionOptimization="clr-namespace:Heat_Production_Optimization"
              RequestedThemeVariant="Default">
 
     <Application.DataTemplates>
         <heatProductionOptimization:ViewLocator/>
     </Application.DataTemplates>
-
+  
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="avares://Heat_Production_Optimization/Styles/Theme.axaml" />
+        <StyleInclude Source="avares://project/Styles/Theme.axaml" />
     </Application.Styles>
 </Application>

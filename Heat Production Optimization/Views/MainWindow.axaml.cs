@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace project.Views;
+namespace Heat_Production_Optimization.Views;
 
 public partial class MainWindow : Window
 {

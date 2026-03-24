@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace project.ViewModels;
+namespace Heat_Production_Optimization.ViewModels;
 
 public partial class GraphsViewModel : ViewModelBase
 {

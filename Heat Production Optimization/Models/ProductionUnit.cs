@@ -1,4 +1,4 @@
-namespace project.Models;
+namespace Heat_Production_Optimization.Models;
 
 public class ProductionUnit
 {

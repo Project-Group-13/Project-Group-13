@@ -4,10 +4,10 @@ using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
-using project.ViewModels;
-using project.Views;
+using Heat_Production_Optimization.ViewModels;
+using Heat_Production_Optimization.Views;
 
-namespace project;
+namespace Heat_Production_Optimization;
 
 public partial class App : Application
 {
