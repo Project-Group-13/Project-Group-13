@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using project.ViewModels;
+using Heat_Production_Optimization.ViewModels;
 
-namespace project;
+namespace Heat_Production_Optimization;
 
 
 [RequiresUnreferencedCode(

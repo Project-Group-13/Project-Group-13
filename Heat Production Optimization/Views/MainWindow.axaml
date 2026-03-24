@@ -1,17 +1,18 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:project.ViewModels"
+        
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:viewModels="clr-namespace:Heat_Production_Optimization.ViewModels"
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
-        x:Class="project.Views.MainWindow"
+        x:Class="Heat_Production_Optimization.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Heat Optimization Scheduler"
         Background="#F4F4F7"
         x:CompileBindings="False">
     <Design.DataContext>
-        <vm:MainWindowViewModel/>
+        <viewModels:MainWindowViewModel/>
     </Design.DataContext>
 
 

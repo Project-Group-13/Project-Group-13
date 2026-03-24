@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace project;
+namespace Heat_Production_Optimization;
 
 sealed class Program
 {

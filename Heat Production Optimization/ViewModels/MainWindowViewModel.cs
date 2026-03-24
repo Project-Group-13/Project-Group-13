@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace project.ViewModels;
+namespace Heat_Production_Optimization.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
