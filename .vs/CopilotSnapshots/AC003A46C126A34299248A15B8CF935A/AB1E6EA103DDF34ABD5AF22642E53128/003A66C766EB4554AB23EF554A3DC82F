@@ -1,4 +1,4 @@
-<Application xmlns="https://github.com/avaloniaui"
+﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Heat_Production_Optimization.App"
              xmlns:local="using:Heat_Production_Optimization"
@@ -11,6 +11,6 @@
 
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="avares://Heat_Production_Optimization/Styles/Theme.axaml" />
+        <StyleInclude Source="avares://Heat Production Optimization/Styles/Theme.axaml" />
     </Application.Styles>
 </Application>
