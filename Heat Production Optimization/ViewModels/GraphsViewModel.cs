@@ -26,8 +26,6 @@ public partial class GraphsViewModel : ViewModelBase
     public ObservableCollection<Axis> XAxes { get; set; } = new();
     public ObservableCollection<Axis> YAxes { get; set; } = new();
 
-    private static readonly SolidColorPaint BlackPaint = new SolidColorPaint(SKColors.Black);
-
     private static SolidColorPaint Black() => new SolidColorPaint(SKColors.Black);
 
     public GraphsViewModel()
@@ -79,7 +77,7 @@ public partial class GraphsViewModel : ViewModelBase
             {
                 Values = values,
                 Name = "Heat Production",
-                Fill = new SolidColorPaint(SKColors.LightBlue.WithAlpha(80)),
+                Fill = new SolidColorPaint(SKColors.LightBlue),
             });
 
             XAxes.Add(new Axis
@@ -117,7 +115,7 @@ public partial class GraphsViewModel : ViewModelBase
         {
             Values = fallbackValues,
             Name = "Unit Max Heat",
-            Fill = new SolidColorPaint(SKColors.LightBlue.WithAlpha(80)),
+            Fill = new SolidColorPaint(SKColors.LightBlue),
         });
 
         XAxes.Add(new Axis
@@ -151,7 +149,7 @@ public partial class GraphsViewModel : ViewModelBase
             {
                 Values = values,
                 Name = "Daily Production Cost",
-                Fill = new SolidColorPaint(SKColors.LightCoral.WithAlpha(80)),
+                Fill = new SolidColorPaint(SKColors.LightCoral),
             });
 
             XAxes.Add(new Axis
@@ -189,7 +187,7 @@ public partial class GraphsViewModel : ViewModelBase
         {
             Values = fallbackValues,
             Name = "Production Cost",
-            Fill = new SolidColorPaint(SKColors.LightCoral.WithAlpha(80)),
+            Fill = new SolidColorPaint(SKColors.LightCoral),
         });
 
         XAxes.Add(new Axis
@@ -227,7 +225,7 @@ public partial class GraphsViewModel : ViewModelBase
         {
             Values = values,
             Name = "Efficiency",
-            Fill = new SolidColorPaint(SKColors.LightGreen.WithAlpha(80)),
+            Fill = new SolidColorPaint(SKColors.LightGreen),
         });
 
         XAxes.Add(new Axis
