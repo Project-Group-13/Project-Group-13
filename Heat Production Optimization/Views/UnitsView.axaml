@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:viewModels="clr-namespace:Heat_Production_Optimization.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+        x:Class="Heat_Production_Optimization.Views.UnitsView"
+        x:CompileBindings="False">
+
+    <Design.DataContext>
+        <viewModels:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <StackPanel Margin="0" Spacing="16">
+        <TextBlock Text="Production Unit Information" FontSize="20" FontWeight="Bold"/>
+        <StackPanel Spacing="12">
+            <TextBlock Text="Select a Unit:"/>
+            <ComboBox ItemsSource="{Binding AllUnits}" 
+                      SelectedItem="{Binding SelectedUnit}"
+                      Width="260">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Separator/>
+            <StackPanel Spacing="10" IsVisible="{Binding SelectedUnit, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <TextBlock Text="Unit Details" FontWeight="Bold" Foreground="#D0021B"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Name:" FontWeight="SemiBold" Width="140"/>
+                    <TextBlock Text="{Binding SelectedUnit.Name}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Max Heat:" FontWeight="SemiBold" Width="140"/>
+                    <TextBlock Text="{Binding SelectedUnit.MaxHeat}"/>
+                    <TextBlock Text="MW"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Production Cost:" FontWeight="SemiBold" Width="140"/>
+                    <TextBlock Text="{Binding SelectedUnit.ProductionCost}"/>
+                    <TextBlock Text="DKK/MWh"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:viewModels="clr-namespace:Heat_Production_Optimization.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+        x:Class="Heat_Production_Optimization.Views.GraphsView"
+        x:CompileBindings="False">
+
+    <Design.DataContext>
+        <viewModels:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <StackPanel Margin="0" Spacing="16">
+        <TextBlock Text="Graph view" FontSize="20" FontWeight="Bold"/>
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <TextBlock Text="Select a graph:" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding GraphOptions}" 
+                      SelectedItem="{Binding SelectedGraph}"
+                      Width="260"
+                      HorizontalAlignment="Left"/>
+        </StackPanel>
+        <lvc:CartesianChart Series="{Binding Series}" 
+                            XAxes="{Binding XAxes}" 
+                            YAxes="{Binding YAxes}" 
+                            Title="{Binding ChartTitle}"
+                            LegendTextPaint="#111111"
+                            LegendBackgroundPaint="#00FFFFFF"
+                            Background="White"
+                            Height="360"/>
+    </StackPanel>
+</UserControl>

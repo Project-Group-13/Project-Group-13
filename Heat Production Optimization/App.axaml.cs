@@ -6,6 +6,9 @@ using System.Linq;
 using Avalonia.Markup.Xaml;
 using Heat_Production_Optimization.ViewModels;
 using Heat_Production_Optimization.Views;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using Heat_Production_Optimization.Services;
 
 namespace Heat_Production_Optimization;
 
@@ -26,6 +29,11 @@ public partial class App : Application
             {
                 DataContext = new MainWindowViewModel(),
             };
+            
+            var services = new ServiceCollection();
+            services.AddSingleton<IFilesService>(x => new FilesService(desktop.MainWindow));
+
+            Services = services.BuildServiceProvider();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -40,4 +48,10 @@ public partial class App : Application
             BindingPlugins.DataValidators.Remove(plugin);
         }
     }
+
+    public new static App? Current => Application.Current as App;
+
+
+    public IServiceProvider? Services { get; private set; }
+
 }

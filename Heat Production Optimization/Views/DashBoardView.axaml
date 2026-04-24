@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:dialogs="using:Avalonia.Dialogs"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:viewModels="clr-namespace:Heat_Production_Optimization.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+        x:Class="Heat_Production_Optimization.Views.DashBoardView"
+        x:CompileBindings="False">
+        
+    <Design.DataContext>
+        <viewModels:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <StackPanel Spacing="16">
+        <TextBlock Text="Dashboard" FontSize="20" FontWeight="Bold"/>
+        <TextBlock Text="The optimization dashboard will be implemented here."/>
+        <Button Command="{Binding UploadFileCommand}">Upload CSV File</Button>
+        <TextBlock Text="{Binding FileText}"/>
+    </StackPanel>
+
+</UserControl>
