@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Dispatching.Models;
+using Heat_Production_Optimization.Models;
 
-namespace Dispatching.Dispatching
+namespace Heat_Production_Optimization.Optimization
 {
     public static class CostBasedDispatcher
     {

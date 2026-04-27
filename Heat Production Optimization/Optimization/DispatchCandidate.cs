@@ -1,4 +1,6 @@
-﻿namespace Dispatching.Models
+﻿using Heat_Production_Optimization.Models;
+
+namespace Heat_Production_Optimization.Models
 {
     public class DispatchCandidate
     {

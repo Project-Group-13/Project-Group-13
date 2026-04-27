@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dispatching.Models
+namespace Heat_Production_Optimization.Models
 {
     public readonly struct HourSlot
     {

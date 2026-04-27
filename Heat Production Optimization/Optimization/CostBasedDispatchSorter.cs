@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Dispatching.Models;
+using Heat_Production_Optimization.Models;
 
-namespace Dispatching.Dispatching
+namespace Heat_Production_Optimization.Optimization
 {
     public static class CostBasedDispatchSorter
     {
         public static List<ProductionUnit> SortByNetProductionCost(
             IEnumerable<DispatchCandidate> candidates)
         {
-            return candidates.OrderBy(c => c.NetProductionCost).ThenBy(c => c.Unit.Id).Select(c => c.Unit).ToList();
+            return candidates.OrderBy(c => c.NetProductionCost).ThenBy(c => c.Unit.Name).Select(c => c.Unit).ToList();
         }
     }
 }
