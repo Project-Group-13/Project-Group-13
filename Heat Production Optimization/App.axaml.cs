@@ -23,7 +23,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            
+            Data.DatabaseInitializer.EnsureCreated();
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
