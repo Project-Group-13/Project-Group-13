@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using Heat_Production_Optimization.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Heat_Production_Optimization.Data;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Heat_Production_Optimization.ViewModels;
 
@@ -34,6 +35,7 @@ public partial class DashBoardViewModel : ViewModelBase
                 await using var readStream = await file.OpenReadAsync();
                 var data = CSVParser.Parse(readStream);
                 ReplaceCSVData.ReplaceAll(data);
+                WeakReferenceMessenger.Default.Send(new CSVUploadedMessage());
             }
             else
             {

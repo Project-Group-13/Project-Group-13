@@ -19,7 +19,6 @@ public class FilesService : IFilesService
         {
             Title = "Open CSV File",
             AllowMultiple = false
-            
         });
 
         return files.Count >= 1 ? files[0] : null;

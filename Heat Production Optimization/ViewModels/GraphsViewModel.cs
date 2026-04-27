@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using Heat_Production_Optimization.Data;
+using Heat_Production_Optimization.Services;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
@@ -11,7 +13,7 @@ using System.Linq;
 
 namespace Heat_Production_Optimization.ViewModels;
 
-public partial class GraphsViewModel : ViewModelBase
+public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMessage>
 {
     [ObservableProperty]
     private string selectedGraph = "Heat Production Over Time";
@@ -31,6 +33,8 @@ public partial class GraphsViewModel : ViewModelBase
     public GraphsViewModel()
     {
         UpdateSeries();
+
+        WeakReferenceMessenger.Default.Register(this);
     }
 
     partial void OnSelectedGraphChanged(string value)
@@ -252,5 +256,10 @@ public partial class GraphsViewModel : ViewModelBase
         ChartTitle = title;
         XAxes.Add(new Axis { Name = "No Data", LabelsPaint = Black(), NamePaint = Black() });
         YAxes.Add(new Axis { Name = "No Data", LabelsPaint = Black(), NamePaint = Black() });
+    }
+
+    public void Receive(CSVUploadedMessage message)
+    {
+        UpdateSeries();
     }
 }
