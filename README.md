@@ -3,6 +3,5 @@
 This is a test change.
 
 
-Implement the messenger design to update the graphs of the changes to the db.
-
+Notify the user that of the unsuccessful upload of files.
 Also implement invisible drag and drop on the whole dashboard surface
