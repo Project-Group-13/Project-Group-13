@@ -162,10 +162,10 @@ public sealed class GraphDataRepository
 
         TryGetOrdinal(reader, "MaxHeat", out var maxHeatOrdinal);
         TryGetOrdinal(reader, "ProductionCost", out var productionCostOrdinal);
-        var hasCo2 = TryGetOrdinal(reader, "Co2Emissions", out var co2Ordinal)
-            || TryGetOrdinal(reader, "CO2Emissions", out co2Ordinal)
-            || TryGetOrdinal(reader, "Co2Emission", out co2Ordinal)
-            || TryGetOrdinal(reader, "CO2Emission", out co2Ordinal);
+        var hasCo2 = TryGetOrdinal(reader, "Co2Rate", out var co2Ordinal)
+            || TryGetOrdinal(reader, "CO2Rate", out co2Ordinal)
+            || TryGetOrdinal(reader, "Co2Rate", out co2Ordinal)
+            || TryGetOrdinal(reader, "CO2Rate", out co2Ordinal);
 
         while (reader.Read())
         {
