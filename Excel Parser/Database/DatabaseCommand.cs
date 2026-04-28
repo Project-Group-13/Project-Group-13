@@ -1,10 +1,18 @@
 using Microsoft.Data.Sqlite;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Parser;
 
 public class DatabaseCommand
 {
-    private string _dbPath = "Data Source=Database/database.db";
+    private readonly string _dbPath;
+
+    public DatabaseCommand()
+    {
+        _dbPath = $"Data Source={ResolveDatabasePath()}";
+    }
 
     public void Insert(Dictionary<DateTime, DailyData> data)
     {
@@ -42,5 +50,29 @@ public class DatabaseCommand
             }
         }
 
+    }
+
+    private static string ResolveDatabasePath()
+    {
+        var candidates = new List<string>
+        {
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Heat Production Optimization", "Data", "database.db"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "database.db"),
+            Path.Combine(AppContext.BaseDirectory, "Database", "database.db"),
+            Path.Combine(Environment.CurrentDirectory, "Heat Production Optimization", "Data", "database.db"),
+            Path.Combine(Environment.CurrentDirectory, "Data", "database.db"),
+            Path.Combine(Environment.CurrentDirectory, "Database", "database.db")
+        };
+
+        foreach (var path in candidates)
+        {
+            var fullPath = Path.GetFullPath(path);
+            if (File.Exists(fullPath))
+            {
+                return fullPath;
+            }
+        }
+
+        return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Heat Production Optimization", "Data", "database.db"));
     }
 }

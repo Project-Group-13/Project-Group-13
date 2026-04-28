@@ -1,12 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Heat_Production_Optimization.Data;
 using LiveChartsCore;
-using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Heat_Production_Optimization.ViewModels;
 
@@ -15,15 +16,15 @@ public partial class GraphsViewModel : ViewModelBase
     [ObservableProperty]
     private string selectedGraph = "Heat Production Over Time";
 
+    private readonly GraphDataRepository _graphDataRepository = new();
+
     public ObservableCollection<ISeries> Series { get; set; } = new();
 
     [ObservableProperty]
-    private string chartTitle;
+    private string chartTitle = string.Empty;
 
     public ObservableCollection<Axis> XAxes { get; set; } = new();
     public ObservableCollection<Axis> YAxes { get; set; } = new();
-
-    private static readonly SolidColorPaint BlackPaint = new SolidColorPaint(SKColors.Black);
 
     private static SolidColorPaint Black() => new SolidColorPaint(SKColors.Black);
 
@@ -37,91 +38,219 @@ public partial class GraphsViewModel : ViewModelBase
         UpdateSeries();
     }
 
-    public List<string> GraphOptions { get; } = new() { "Heat Production Over Time", "Daily Production Costs", "30-Day Efficiency Trends" };
+    public List<string> GraphOptions { get; } = new()
+    {
+        "Heat Production Over Time",
+        "Daily Production Costs",
+        "30-Day Efficiency Trends"
+    };
 
     private void UpdateSeries()
     {
         Series.Clear();
-        var random = new Random();
-        string yAxisName = "";
-        string title = "";
-
         XAxes.Clear();
         YAxes.Clear();
 
         if (SelectedGraph == "Heat Production Over Time")
         {
-            // Filled line chart for heat production over time
-            var data = new List<ObservablePoint>();
-            for (int i = 0; i < 24; i++) // 24 hours
-            {
-                data.Add(new ObservablePoint(i, random.Next(0, 50)));
-            }
-            Series.Add(new LineSeries<ObservablePoint>
-            {
-                Values = data,
-                Name = "Heat Production",
-                Fill = new SolidColorPaint(SKColors.LightBlue.WithAlpha(100))
-            });
-            yAxisName = "Heat (MW)";
-            title = "Heat Production Over Time";
-            XAxes.Add(new Axis { Labeler = value => $"{(int)value:D2}:00", Name = "Time", MinLimit = 0, MaxLimit = 23, LabelsPaint = Black(), NamePaint = Black() });
-            YAxes.Add(new Axis { Name = yAxisName, Labeler = value => $"{value} MW", LabelsPaint = Black(), NamePaint = Black() });
+            BuildHeatDemandChart();
         }
         else if (SelectedGraph == "Daily Production Costs")
         {
-            // Filled line chart for daily production costs
-            var data = new List<ObservablePoint>();
-            for (int i = 1; i <= 7; i++) // Days 1 to 7
-            {
-                data.Add(new ObservablePoint(i, random.Next(50, 100)));
-            }
-            Series.Add(new LineSeries<ObservablePoint>
-            {
-                Values = data,
-                Name = "Daily Production Cost",
-                Fill = new SolidColorPaint(SKColors.LightCoral.WithAlpha(100))
-            });
-            yAxisName = "Cost (DKK)";
-            title = "Daily Production Costs";
-            var labels = new string[8];
-            labels[0] = "";
-            labels[1] = "Mon";
-            labels[2] = "Tue";
-            labels[3] = "Wed";
-            labels[4] = "Thu";
-            labels[5] = "Fri";
-            labels[6] = "Sat";
-            labels[7] = "Sun";
-            XAxes.Add(new Axis { Labels = labels, Name = "Day", MinLimit = 1, MaxLimit = 7, LabelsPaint = Black(), NamePaint = Black() });
-            YAxes.Add(new Axis { Name = yAxisName, Labeler = value => $"{value} DKK", LabelsPaint = Black(), NamePaint = Black() });
+            BuildDailyCostChart();
         }
         else if (SelectedGraph == "30-Day Efficiency Trends")
         {
-            // Filled line chart for efficiency trends over 30 days
-            var data = new List<ObservablePoint>();
-            for (int i = 1; i <= 30; i++) // Days 1 to 30
+            BuildEfficiencyChart();
+        }
+    }
+
+    private void BuildHeatDemandChart()
+    {
+        var sourceData = _graphDataRepository.GetHeatDemandSeries();
+        if (sourceData.Count > 0)
+        {
+            var labels = sourceData.Select(p => p.Timestamp.ToString("MM-dd HH:mm")).ToArray();
+            var values = sourceData.Select(p => p.Value).ToArray();
+
+            Series.Add(new ColumnSeries<double>
             {
-                data.Add(new ObservablePoint(i, random.Next(70, 100))); // Efficiency 70-100%
-            }
-            Series.Add(new LineSeries<ObservablePoint>
-            {
-                Values = data,
-                Name = "Efficiency",
-                Fill = new SolidColorPaint(SKColors.LightGreen.WithAlpha(100))
+                Values = values,
+                Name = "Heat Production",
+                Fill = new SolidColorPaint(SKColors.LightBlue),
             });
-            yAxisName = "Efficiency (%)";
-            title = "30-Day Efficiency Trends";
-            var labels = new string[31];
-            labels[0] = "";
-            for (int i = 1; i <= 30; i++)
+
+            XAxes.Add(new Axis
             {
-                labels[i] = i.ToString();
-            }
-            XAxes.Add(new Axis { Labels = labels, Name = "Day", MinLimit = 1, MaxLimit = 30, LabelsPaint = Black(), NamePaint = Black() });
-            YAxes.Add(new Axis { Name = yAxisName, Labeler = value => $"{value}%", LabelsPaint = Black(), NamePaint = Black() });
+                Labels = labels,
+                Name = "Time",
+                LabelsPaint = Black(),
+                NamePaint = Black()
+            });
+
+            YAxes.Add(new Axis
+            {
+                Name = "Heat (MW)",
+                Labeler = value => $"{value:0.##} MW",
+                LabelsPaint = Black(),
+                NamePaint = Black()
+            });
+
+            ChartTitle = "Heat Production Over Time";
+            return;
         }
 
+        // Fallback to unit capacities when no time-series source rows exist.
+        var unitHeat = _graphDataRepository.GetUnitMaxHeatSeries();
+        if (unitHeat.Count == 0)
+        {
+            SetNoDataState("No Heat Data Found");
+            return;
+        }
+
+        var fallbackLabels = unitHeat.Select(p => p.UnitName).ToArray();
+        var fallbackValues = unitHeat.Select(p => p.Value).ToArray();
+
+        Series.Add(new ColumnSeries<double>
+        {
+            Values = fallbackValues,
+            Name = "Unit Max Heat",
+            Fill = new SolidColorPaint(SKColors.LightBlue),
+        });
+
+        XAxes.Add(new Axis
+        {
+            Labels = fallbackLabels,
+            Name = "Unit",
+            LabelsPaint = Black(),
+            NamePaint = Black()
+        });
+
+        YAxes.Add(new Axis
+        {
+            Name = "Heat (MW)",
+            Labeler = value => $"{value:0.##} MW",
+            LabelsPaint = Black(),
+            NamePaint = Black()
+        });
+
+        ChartTitle = "Heat Production Over Time (Unit Fallback)";
+    }
+
+    private void BuildDailyCostChart()
+    {
+        var costData = _graphDataRepository.GetEstimatedDailyCostSeries();
+        if (costData.Count > 0)
+        {
+            var labels = costData.Select(p => p.Timestamp.ToString("MM-dd")).ToArray();
+            var values = costData.Select(p => p.Value).ToArray();
+
+            Series.Add(new ColumnSeries<double>
+            {
+                Values = values,
+                Name = "Daily Production Cost",
+                Fill = new SolidColorPaint(SKColors.LightCoral),
+            });
+
+            XAxes.Add(new Axis
+            {
+                Labels = labels,
+                Name = "Day",
+                LabelsPaint = Black(),
+                NamePaint = Black()
+            });
+
+            YAxes.Add(new Axis
+            {
+                Name = "Cost (DKK)",
+                Labeler = value => $"{value:0.##} DKK",
+                LabelsPaint = Black(),
+                NamePaint = Black()
+            });
+
+            ChartTitle = "Daily Production Costs";
+            return;
+        }
+
+        // Fallback to unit production cost when no daily source rows exist.
+        var unitCost = _graphDataRepository.GetUnitCostSeries();
+        if (unitCost.Count == 0)
+        {
+            SetNoDataState("No Production Cost Data Found");
+            return;
+        }
+
+        var fallbackLabels = unitCost.Select(p => p.UnitName).ToArray();
+        var fallbackValues = unitCost.Select(p => p.Value).ToArray();
+
+        Series.Add(new ColumnSeries<double>
+        {
+            Values = fallbackValues,
+            Name = "Production Cost",
+            Fill = new SolidColorPaint(SKColors.LightCoral),
+        });
+
+        XAxes.Add(new Axis
+        {
+            Labels = fallbackLabels,
+            Name = "Unit",
+            LabelsPaint = Black(),
+            NamePaint = Black()
+        });
+
+        YAxes.Add(new Axis
+        {
+            Name = "Cost (DKK)",
+            Labeler = value => $"{value:0.##} DKK",
+            LabelsPaint = Black(),
+            NamePaint = Black()
+        });
+
+        ChartTitle = "Daily Production Costs (Unit Fallback)";
+    }
+
+    private void BuildEfficiencyChart()
+    {
+        var efficiencyData = _graphDataRepository.GetUnitEnergyRateSeries();
+        if (efficiencyData.Count == 0)
+        {
+            SetNoDataState("No Efficiency Data Found");
+            return;
+        }
+
+        var labels = efficiencyData.Select(p => p.UnitName).ToArray();
+        var values = efficiencyData.Select(p => p.Value).ToArray();
+
+        Series.Add(new ColumnSeries<double>
+        {
+            Values = values,
+            Name = "Efficiency",
+            Fill = new SolidColorPaint(SKColors.LightGreen),
+        });
+
+        XAxes.Add(new Axis
+        {
+            Labels = labels,
+            Name = "Unit",
+            LabelsPaint = Black(),
+            NamePaint = Black()
+        });
+
+        YAxes.Add(new Axis
+        {
+            Name = "Efficiency",
+            Labeler = value => $"{value:0.##}",
+            LabelsPaint = Black(),
+            NamePaint = Black()
+        });
+
+        ChartTitle = "30-Day Efficiency Trends";
+    }
+
+    private void SetNoDataState(string title)
+    {
         ChartTitle = title;
+        XAxes.Add(new Axis { Name = "No Data", LabelsPaint = Black(), NamePaint = Black() });
+        YAxes.Add(new Axis { Name = "No Data", LabelsPaint = Black(), NamePaint = Black() });
     }
 }
