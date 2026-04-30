@@ -15,6 +15,71 @@
         <viewModels:MainWindowViewModel/>
     </Design.DataContext>
 
+    <Window.Styles>
+        <Style Selector="Button.unit-card-button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.unit-card-button:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton.unit-card-toggle">
+            <Setter Property="Background" Value="#64748B" />
+            <Setter Property="BorderBrush" Value="#475569" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Padding="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ToggleButton.unit-card-toggle:unchecked">
+            <Setter Property="Background" Value="#64748B" />
+            <Setter Property="BorderBrush" Value="#475569" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton.unit-card-toggle:unchecked:pointerover">
+            <Setter Property="Background" Value="#475569" />
+            <Setter Property="BorderBrush" Value="#334155" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton.unit-card-toggle:unchecked:pressed">
+            <Setter Property="Background" Value="#334155" />
+            <Setter Property="BorderBrush" Value="#1F2937" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton.unit-card-toggle:checked">
+            <Setter Property="Background" Value="#16A34A" />
+            <Setter Property="BorderBrush" Value="#15803D" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton.unit-card-toggle:pointerover">
+            <Setter Property="Background" Value="#475569" />
+            <Setter Property="BorderBrush" Value="#334155" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton.unit-card-toggle:checked:pointerover">
+            <Setter Property="Background" Value="#15803D" />
+            <Setter Property="BorderBrush" Value="#166534" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+
 
 
     <Grid>
@@ -31,7 +96,7 @@
         </Border>
 
         <!-- Main content -->
-        <ScrollViewer Grid.Row="1" Padding="20" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" Padding="20" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <Border Background="White" CornerRadius="14" Padding="20">
                 <TabControl>
                     <TabItem Header="Dashboard">
@@ -51,6 +116,18 @@
                                           Width="260"
                                           HorizontalAlignment="Left"/>
                             </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" IsVisible="{Binding IsScheduleGraphSelected}">
+                                <TextBlock Text="Schedule date:" VerticalAlignment="Center"/>
+                                <ComboBox ItemsSource="{Binding AvailableYears}"
+                                          SelectedItem="{Binding SelectedYear}"
+                                          Width="90"/>
+                                <ComboBox ItemsSource="{Binding AvailableMonths}"
+                                          SelectedItem="{Binding SelectedMonth}"
+                                          Width="70"/>
+                                <ComboBox ItemsSource="{Binding AvailableDays}"
+                                          SelectedItem="{Binding SelectedDay}"
+                                          Width="70"/>
+                            </StackPanel>
                             <lvc:CartesianChart Series="{Binding Series}" 
                                                 XAxes="{Binding XAxes}" 
                                                 YAxes="{Binding YAxes}" 
@@ -63,38 +140,80 @@
                     </TabItem>
 
                     <TabItem Header="Units">
-                        <StackPanel Margin="0" Spacing="16">
-                            <TextBlock Text="Production Unit Information" FontSize="20" FontWeight="Bold"/>
-                            <StackPanel DataContext="{Binding UnitsViewModel}" Spacing="12">
-                                <TextBlock Text="Select a Unit:"/>
-                                <ComboBox ItemsSource="{Binding AllUnits}" 
-                                          SelectedItem="{Binding SelectedUnit}"
-                                          Width="260">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding Name}" />
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                                <Separator/>
-                                <StackPanel Spacing="10" IsVisible="{Binding SelectedUnit, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                    <TextBlock Text="Unit Details" FontWeight="Bold" Foreground="#D0021B"/>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="Name:" FontWeight="SemiBold" Width="140"/>
-                                        <TextBlock Text="{Binding SelectedUnit.Name}"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="Max Heat:" FontWeight="SemiBold" Width="140"/>
-                                        <TextBlock Text="{Binding SelectedUnit.MaxHeat}"/>
-                                        <TextBlock Text="MW"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="Production Cost:" FontWeight="SemiBold" Width="140"/>
-                                        <TextBlock Text="{Binding SelectedUnit.ProductionCost}"/>
-                                        <TextBlock Text="DKK/MWh"/>
-                                    </StackPanel>
+                        <StackPanel Margin="0" Spacing="16" DataContext="{Binding UnitsViewModel}">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Production Units" FontSize="20" FontWeight="Bold" Foreground="#111827"/>
+                                    <TextBlock Text="Click a card to open the details window." Foreground="#4B5563" FontSize="14"/>
                                 </StackPanel>
-                            </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{Binding AllUnits.Count, StringFormat=\'Units: {0}\'}" VerticalAlignment="Center" Foreground="#6B7280" FontSize="14"/>
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{Binding AllUnits}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="340" Margin="12" CornerRadius="20" Background="#FFFFFF" BorderBrush="#E5E7EB" BorderThickness="1">
+                                            <Grid RowDefinitions="200,Auto" MinHeight="390">
+                                                <Button Grid.Row="0"
+                                                    Classes="unit-card-button"
+                                                        Command="{Binding DataContext.UnitsViewModel.OpenUnitDetailsCommand, RelativeSource={RelativeSource AncestorType=TabControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Padding="0"
+                                                        BorderThickness="0"
+                                                        Background="Transparent">
+                                                    <Grid>
+                                                        <Border CornerRadius="20,20,0,0" Background="#F3F4F6" />
+                                                        <Grid>
+                                                            <Image Source="{Binding Image}" Stretch="UniformToFill" />
+                                                            <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12" CornerRadius="999" Background="#D0021B" Padding="10,5">
+                                                                <TextBlock Text="{Binding Enabled, StringFormat=Status: {0}}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                                            </Border>
+                                                            <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12" CornerRadius="999" Background="#111827CC" Padding="10,5">
+                                                                <TextBlock Text="View details" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                                            </Border>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Button>
+
+                                                <Border Grid.Row="1" Padding="18">
+                                                    <StackPanel Spacing="12">
+                                                        <StackPanel Spacing="2">
+                                                            <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="Bold" Foreground="#111827" />
+                                                            <TextBlock Text="{Binding ProductionCost, StringFormat={}{0:F2} DKK/MWh}" Foreground="#6B7280" FontSize="14" />
+                                                        </StackPanel>
+
+                                                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="12">
+                                                            <TextBlock Text="Heat" Foreground="#6B7280" FontSize="13" />
+                                                            <TextBlock Grid.Column="1" Text="{Binding MaxHeat, StringFormat={}{0:F0} MW}" FontWeight="SemiBold" HorizontalAlignment="Right" Foreground="#111827" />
+
+                                                            <TextBlock Grid.Row="1" Text="CO2" Foreground="#6B7280" FontSize="13" />
+                                                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Co2Emissions, StringFormat={}{0:F1} kg/MWh}" FontWeight="SemiBold" HorizontalAlignment="Right" Foreground="#111827" />
+                                                        </Grid>
+
+                                                        <ToggleButton Classes="unit-card-toggle"
+                                                                      IsChecked="{Binding Enabled, Mode=TwoWay}"
+                                                                      Content="Enable / Disable"
+                                                                      HorizontalAlignment="Stretch"
+                                                                      HorizontalContentAlignment="Center"
+                                                                      VerticalAlignment="Center"
+                                                                      Padding="12,10"
+                                                                      FontWeight="SemiBold"
+                                                                      PointerEntered="UnitCardToggle_PointerEntered"
+                                                                      PointerExited="UnitCardToggle_PointerExited"
+                                                                      Checked="UnitCardToggle_CheckedChanged"
+                                                                      Unchecked="UnitCardToggle_CheckedChanged" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </TabItem>
                 </TabControl>

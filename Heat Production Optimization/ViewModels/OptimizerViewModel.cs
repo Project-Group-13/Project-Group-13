@@ -73,8 +73,8 @@ public partial class OptimizerViewModel : ViewModelBase
 
         HeatDemandText = $"Heat Demand: {heatDemand:F2} MWh";
 
-        // Production units
-        var units = _unitRepo.GetProductionUnits();
+        // Production units (convert to List for the optimizer)
+        var units = _unitRepo.GetProductionUnits().ToList();
             
 
         // HourSlot (no minutes, no seconds)
