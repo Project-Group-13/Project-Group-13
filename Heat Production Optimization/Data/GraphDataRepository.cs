@@ -204,6 +204,8 @@ public sealed class GraphDataRepository
             || TryGetOrdinal(reader, "CO2Rate", out co2Ordinal)
             || TryGetOrdinal(reader, "Co2Rate", out co2Ordinal)
             || TryGetOrdinal(reader, "CO2Rate", out co2Ordinal);
+        TryGetOrdinal(reader, "ImagePath", out var imagePathOrdinal);
+
 
         while (reader.Read())
         {

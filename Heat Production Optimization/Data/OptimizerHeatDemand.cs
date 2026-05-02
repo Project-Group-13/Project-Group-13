@@ -1,23 +1,27 @@
 using System;
 using System.Collections.Generic;
+using Avalonia.Controls;
 using Microsoft.Data.Sqlite;
 
 namespace Heat_Production_Optimization.Data
 {
     public class OptimizerHeatDemand
     {
-        private readonly IDatabasService _dbService;
+        private readonly DatabaseConnector _dbService;
 
         public OptimizerHeatDemand()
         {
-            _dbService = DatabaseService.DBService;
+            _dbService = new();
         }
 
         public List<double> GetHeatDemandForDay(DateTime date)
         {
             var heatDemands = new double[24];
 
-            using var command = _dbService.GetCommand();
+            using var connection = _dbService.GetConnection();
+            connection.Open();
+
+            using var command = connection.CreateCommand();
 
             command.CommandText = @"
                 SELECT TimeFrom, HeatDemand

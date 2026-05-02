@@ -16,7 +16,8 @@
     <StackPanel Spacing="16">
         <TextBlock Text="Dashboard" FontSize="20" FontWeight="Bold"/>
         <TextBlock Text="The optimization dashboard will be implemented here."/>
-        <Button Command="{Binding UploadFileCommand}">Upload CSV File</Button>
+        <Button Command="{Binding UploadFileCommand}">Upload Source Data</Button>
+        <Button Command="{Binding UploadUnitsFileCommand}">Upload Production Units</Button>
         <TextBlock Text="{Binding FileText}"/>
     </StackPanel>
 

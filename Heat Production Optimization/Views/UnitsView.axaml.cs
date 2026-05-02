@@ -1,5 +1,8 @@
 using Avalonia.Controls;
-
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Interactivity;
 namespace Heat_Production_Optimization.Views;
 
 public partial class UnitsView : UserControl
@@ -7,5 +10,48 @@ public partial class UnitsView : UserControl
     public UnitsView()
     {
         InitializeComponent();
+    }
+
+    private static void ApplyUnitToggleAppearance(ToggleButton toggle)
+    {
+        var isChecked = toggle.IsChecked == true;
+        var isPointerOver = toggle.IsPointerOver;
+
+        if (isChecked)
+        {
+            toggle.Background = new SolidColorBrush(Color.Parse(isPointerOver ? "#15803D" : "#16A34A"));
+            toggle.BorderBrush = new SolidColorBrush(Color.Parse(isPointerOver ? "#166534" : "#15803D"));
+        }
+        else
+        {
+            toggle.Background = new SolidColorBrush(Color.Parse(isPointerOver ? "#475569" : "#64748B"));
+            toggle.BorderBrush = new SolidColorBrush(Color.Parse(isPointerOver ? "#334155" : "#475569"));
+        }
+
+        toggle.Foreground = Brushes.White;
+    }
+
+    private void UnitCardToggle_CheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        if (sender is ToggleButton toggle)
+        {
+            ApplyUnitToggleAppearance(toggle);
+        }
+    }
+
+    private void UnitCardToggle_PointerEntered(object? sender, PointerEventArgs e)
+    {
+        if (sender is ToggleButton toggle)
+        {
+            ApplyUnitToggleAppearance(toggle);
+        }
+    }
+
+    private void UnitCardToggle_PointerExited(object? sender, PointerEventArgs e)
+    {
+        if (sender is ToggleButton toggle)
+        {
+            ApplyUnitToggleAppearance(toggle);
+        }
     }
 }

@@ -47,4 +47,33 @@ public partial class DashBoardViewModel : ViewModelBase
             Console.WriteLine(e.Message);
         }
     }
+
+    [RelayCommand]
+    private async Task UploadUnitsFile(CancellationToken token)
+    {
+        try
+        {
+            var filesService = App.Current?.Services?.GetService<IFilesService>();
+            if (filesService is null) throw new NullReferenceException("Missing File Service instance.");
+
+            var file = await filesService.UploadFileAsync();
+            if (file is null) return;
+
+            if ((await file.GetBasicPropertiesAsync()).Size <= 1024 * 1024 * 1000)
+            {
+                await using var readStream = await file.OpenReadAsync();
+                var data = ProductionUnitParser.Parse(readStream);
+                ReplaceProductionUnitsData.ReplaceAll(data);
+                WeakReferenceMessenger.Default.Send(new CSVUploadedMessage());
+            }
+            else
+            {
+                throw new Exception("File exceeded 1GB limit.");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
 }
