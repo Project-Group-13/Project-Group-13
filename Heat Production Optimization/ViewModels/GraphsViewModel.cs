@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Heat_Production_Optimization.Data;
+using Heat_Production_Optimization.Models;
+using Heat_Production_Optimization.Optimization;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
@@ -13,10 +15,40 @@ namespace Heat_Production_Optimization.ViewModels;
 
 public partial class GraphsViewModel : ViewModelBase
 {
+    private const string ScheduleGraphLabel = "Heat Demand Schedule (By Date)";
+    private const int FallbackMonth = 1;
+    private const int FallbackDay = 1;
+
     [ObservableProperty]
     private string selectedGraph = "Heat Production Over Time";
 
     private readonly GraphDataRepository _graphDataRepository = new();
+    private readonly OptimizerHeatDemand _heatDemandRepo = new();
+    private readonly Optimizer _optimizer = new();
+
+    private List<DateOnly> _availableDates = new();
+    private bool _suppressDateUpdates;
+
+    [ObservableProperty]
+    private List<int> availableYears = new();
+
+    [ObservableProperty]
+    private List<int> availableMonths = new();
+
+    [ObservableProperty]
+    private List<int> availableDays = new();
+
+    [ObservableProperty]
+    private int selectedYear = DateTime.Today.Year;
+
+    [ObservableProperty]
+    private int selectedMonth = DateTime.Today.Month;
+
+    [ObservableProperty]
+    private int selectedDay = DateTime.Today.Day;
+
+    [ObservableProperty]
+    private bool isScheduleGraphSelected;
 
     public ObservableCollection<ISeries> Series { get; set; } = new();
 
@@ -30,19 +62,74 @@ public partial class GraphsViewModel : ViewModelBase
 
     public GraphsViewModel()
     {
+        RefreshAvailableDates();
+        IsScheduleGraphSelected = SelectedGraph == ScheduleGraphLabel;
         UpdateSeries();
     }
 
     partial void OnSelectedGraphChanged(string value)
     {
+        IsScheduleGraphSelected = value == ScheduleGraphLabel;
+        if (IsScheduleGraphSelected)
+        {
+            RefreshAvailableDates();
+        }
         UpdateSeries();
+    }
+
+    partial void OnSelectedYearChanged(int value)
+    {
+        if (_suppressDateUpdates)
+        {
+            return;
+        }
+
+        _suppressDateUpdates = true;
+        SyncMonthAndDayForYear(value);
+        _suppressDateUpdates = false;
+
+        if (IsScheduleGraphSelected)
+        {
+            UpdateSeries();
+        }
+    }
+
+    partial void OnSelectedMonthChanged(int value)
+    {
+        if (_suppressDateUpdates)
+        {
+            return;
+        }
+
+        _suppressDateUpdates = true;
+        SyncDaysForMonth(SelectedYear, value);
+        _suppressDateUpdates = false;
+
+        if (IsScheduleGraphSelected)
+        {
+            UpdateSeries();
+        }
+    }
+
+    partial void OnSelectedDayChanged(int value)
+    {
+        if (_suppressDateUpdates)
+        {
+            return;
+        }
+
+        if (IsScheduleGraphSelected)
+        {
+            UpdateSeries();
+        }
     }
 
     public List<string> GraphOptions { get; } = new()
     {
         "Heat Production Over Time",
         "Daily Production Costs",
-        "30-Day Efficiency Trends"
+        "30-Day Efficiency Trends",
+        ScheduleGraphLabel
     };
 
     private void UpdateSeries()
@@ -62,6 +149,10 @@ public partial class GraphsViewModel : ViewModelBase
         else if (SelectedGraph == "30-Day Efficiency Trends")
         {
             BuildEfficiencyChart();
+        }
+        else if (SelectedGraph == ScheduleGraphLabel)
+        {
+            BuildDailyScheduleChart();
         }
     }
 
@@ -247,10 +338,184 @@ public partial class GraphsViewModel : ViewModelBase
         ChartTitle = "30-Day Efficiency Trends";
     }
 
+    private void BuildDailyScheduleChart()
+    {
+        DateTime date;
+        try
+        {
+            date = new DateTime(SelectedYear, SelectedMonth, SelectedDay);
+        }
+        catch
+        {
+            SetNoDataState("Invalid Date");
+            return;
+        }
+
+        var heatDemands = _heatDemandRepo.GetHeatDemandForDay(date);
+        if (heatDemands.Count == 0 || heatDemands.All(value => value <= 0))
+        {
+            SetNoDataState("No Heat Demand Data For Date");
+            return;
+        }
+
+        var units = _graphDataRepository.GetProductionUnits();
+        if (units.Count == 0)
+        {
+            SetNoDataState("No Production Units Found");
+            return;
+        }
+
+        var unitNames = units.Select(unit => unit.Name).Distinct().ToList();
+        var unitSeries = unitNames.ToDictionary(name => name, _ => new double[24]);
+        var dateOnly = new DateOnly(SelectedYear, SelectedMonth, SelectedDay);
+
+        for (var hour = 0; hour < 24; hour++)
+        {
+            var demand = hour < heatDemands.Count ? heatDemands[hour] : 0;
+            if (demand <= 0)
+            {
+                continue;
+            }
+
+            var results = _optimizer.Optimize(demand, units.ToList(), new HourSlot(dateOnly, hour));
+            foreach (var result in results)
+            {
+                if (unitSeries.TryGetValue(result.UnitName, out var values))
+                {
+                    values[hour] = result.HeatProduced;
+                }
+            }
+        }
+
+        var palette = new[]
+        {
+            SKColors.SteelBlue,
+            SKColors.MediumSeaGreen,
+            SKColors.SandyBrown,
+            SKColors.MediumPurple,
+            SKColors.IndianRed,
+            SKColors.CadetBlue,
+            SKColors.Goldenrod,
+            SKColors.LightSlateGray
+        };
+
+        for (var i = 0; i < unitNames.Count; i++)
+        {
+            var unitName = unitNames[i];
+            Series.Add(new StackedColumnSeries<double>
+            {
+                Values = unitSeries[unitName],
+                Name = unitName,
+                Fill = new SolidColorPaint(palette[i % palette.Length])
+            });
+        }
+
+        Series.Add(new LineSeries<double>
+        {
+            Values = heatDemands.Take(24).ToArray(),
+            Name = "Heat Demand",
+            Stroke = new SolidColorPaint(SKColors.DarkOrange, 3),
+            Fill = null,
+            GeometryFill = new SolidColorPaint(SKColors.White),
+            GeometryStroke = new SolidColorPaint(SKColors.DarkOrange, 3)
+        });
+
+        XAxes.Add(new Axis
+        {
+            Labels = Enumerable.Range(0, 24).Select(hour => $"{hour:00}:00").ToArray(),
+            Name = "Hour",
+            LabelsPaint = Black(),
+            NamePaint = Black()
+        });
+
+        YAxes.Add(new Axis
+        {
+            Name = "Heat (MW)",
+            Labeler = value => $"{value:0.##} MW",
+            LabelsPaint = Black(),
+            NamePaint = Black()
+        });
+
+        ChartTitle = $"Heat Demand Schedule ({date:yyyy-MM-dd})";
+    }
+
     private void SetNoDataState(string title)
     {
         ChartTitle = title;
         XAxes.Add(new Axis { Name = "No Data", LabelsPaint = Black(), NamePaint = Black() });
         YAxes.Add(new Axis { Name = "No Data", LabelsPaint = Black(), NamePaint = Black() });
+    }
+
+    private void RefreshAvailableDates()
+    {
+        _availableDates = _graphDataRepository.GetAvailableHeatDemandDates().ToList();
+        if (_availableDates.Count == 0)
+        {
+            _availableDates.Add(DateOnly.FromDateTime(DateTime.Today));
+        }
+
+        AvailableYears = _availableDates
+            .Select(date => date.Year)
+            .Distinct()
+            .OrderBy(year => year)
+            .ToList();
+
+        if (AvailableYears.Count == 0)
+        {
+            AvailableYears = new List<int> { DateTime.Today.Year };
+        }
+
+        _suppressDateUpdates = true;
+        if (!AvailableYears.Contains(SelectedYear))
+        {
+            SelectedYear = AvailableYears.Last();
+        }
+
+        SyncMonthAndDayForYear(SelectedYear);
+        _suppressDateUpdates = false;
+    }
+
+    private void SyncMonthAndDayForYear(int year)
+    {
+        var months = _availableDates
+            .Where(date => date.Year == year)
+            .Select(date => date.Month)
+            .Distinct()
+            .OrderBy(month => month)
+            .ToList();
+
+        if (months.Count == 0)
+        {
+            months.Add(FallbackMonth);
+        }
+
+        AvailableMonths = months;
+        if (!AvailableMonths.Contains(SelectedMonth))
+        {
+            SelectedMonth = AvailableMonths.Last();
+        }
+
+        SyncDaysForMonth(year, SelectedMonth);
+    }
+
+    private void SyncDaysForMonth(int year, int month)
+    {
+        var days = _availableDates
+            .Where(date => date.Year == year && date.Month == month)
+            .Select(date => date.Day)
+            .Distinct()
+            .OrderBy(day => day)
+            .ToList();
+
+        if (days.Count == 0)
+        {
+            days.Add(FallbackDay);
+        }
+
+        AvailableDays = days;
+        if (!AvailableDays.Contains(SelectedDay))
+        {
+            SelectedDay = AvailableDays.Last();
+        }
     }
 }

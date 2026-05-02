@@ -3,17 +3,23 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Interactivity;
+using Heat_Production_Optimization.Models;
 
 namespace Heat_Production_Optimization.Views;
 
-public partial class MainWindow : Window
+public partial class UnitDetails : Window
 {
-    public MainWindow()
+    public UnitDetails()
     {
         InitializeComponent();
     }
 
-    private static void ApplyUnitToggleAppearance(ToggleButton toggle)
+    public UnitDetails(ProductionUnit unit) : this()
+    {
+        DataContext = unit;
+    }
+
+    private static void ApplyDetailToggleAppearance(ToggleButton toggle)
     {
         var isChecked = toggle.IsChecked == true;
         var isPointerOver = toggle.IsPointerOver;
@@ -32,27 +38,32 @@ public partial class MainWindow : Window
         toggle.Foreground = Brushes.White;
     }
 
-    private void UnitCardToggle_CheckedChanged(object? sender, RoutedEventArgs e)
+    private void DetailToggle_CheckedChanged(object? sender, RoutedEventArgs e)
     {
         if (sender is ToggleButton toggle)
         {
-            ApplyUnitToggleAppearance(toggle);
+            ApplyDetailToggleAppearance(toggle);
         }
     }
 
-    private void UnitCardToggle_PointerEntered(object? sender, PointerEventArgs e)
+    private void DetailToggle_PointerEntered(object? sender, PointerEventArgs e)
     {
         if (sender is ToggleButton toggle)
         {
-            ApplyUnitToggleAppearance(toggle);
+            ApplyDetailToggleAppearance(toggle);
         }
     }
 
-    private void UnitCardToggle_PointerExited(object? sender, PointerEventArgs e)
+    private void DetailToggle_PointerExited(object? sender, PointerEventArgs e)
     {
         if (sender is ToggleButton toggle)
         {
-            ApplyUnitToggleAppearance(toggle);
+            ApplyDetailToggleAppearance(toggle);
         }
+    }
+
+    private void OnCloseClick(object? sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }
