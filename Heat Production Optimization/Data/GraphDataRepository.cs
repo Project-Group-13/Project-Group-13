@@ -45,6 +45,44 @@ public sealed class GraphDataRepository
         return data;
     }
 
+    public IReadOnlyList<DateOnly> GetAvailableHeatDemandDates()
+    {
+        var data = new List<DateOnly>();
+        if (!TableExists("SourceData"))
+        {
+            return data;
+        }
+
+        using var connection = _connector.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = @"
+            SELECT DISTINCT date(TimeFrom) AS DayBucket
+            FROM SourceData
+            WHERE TimeFrom IS NOT NULL AND HeatDemand IS NOT NULL
+            ORDER BY date(TimeFrom);";
+
+        var seen = new HashSet<DateOnly>();
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var timestamp = ParseDateTime(reader.GetValue(0));
+            if (timestamp == DateTime.MinValue)
+            {
+                continue;
+            }
+
+            var date = DateOnly.FromDateTime(timestamp);
+            if (seen.Add(date))
+            {
+                data.Add(date);
+            }
+        }
+
+        return data;
+    }
+
     public IReadOnlyList<HeatPoint> GetElectricityPriceSeries(int maxPoints = 120)
     {
         var data = new List<HeatPoint>();
@@ -177,6 +215,7 @@ public sealed class GraphDataRepository
 
             var maxHeat = maxHeatOrdinal >= 0 ? ParseDouble(reader.GetValue(maxHeatOrdinal)) : double.NaN;
             var productionCost = productionCostOrdinal >= 0 ? ParseDouble(reader.GetValue(productionCostOrdinal)) : double.NaN;
+            var imagePath = imagePathOrdinal >= 0 ? Convert.ToString(reader.GetValue(imagePathOrdinal), CultureInfo.InvariantCulture) : string.Empty;
             var co2 = hasCo2 && co2Ordinal >= 0 ? ParseDouble(reader.GetValue(co2Ordinal)) : double.NaN;
 
             data.Add(new ProductionUnit
@@ -184,7 +223,8 @@ public sealed class GraphDataRepository
                 Name = unitName,
                 MaxHeat = double.IsNaN(maxHeat) ? 0 : maxHeat,
                 ProductionCost = double.IsNaN(productionCost) ? 0 : productionCost,
-                Co2Emissions = double.IsNaN(co2) ? 0 : co2
+                Co2Emissions = double.IsNaN(co2) ? 0 : co2,
+                ImagePath = imagePath ?? string.Empty
             });
         }
 
