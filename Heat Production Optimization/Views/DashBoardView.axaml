@@ -8,7 +8,7 @@
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
         x:Class="Heat_Production_Optimization.Views.DashBoardView"
         x:CompileBindings="False">
-        
+
     <Design.DataContext>
         <viewModels:MainWindowViewModel/>
     </Design.DataContext>
@@ -16,7 +16,7 @@
     <StackPanel Spacing="16">
         <TextBlock Text="Dashboard" FontSize="20" FontWeight="Bold"/>
         <TextBlock Text="The optimization dashboard will be implemented here."/>
-        <Button Command="{Binding UploadFileCommand}">Upload Source Data</Button>
+        <Button Command="{Binding UploadSourceDataFileCommand}">Upload Source Data</Button>
         <Button Command="{Binding UploadUnitsFileCommand}">Upload Production Units</Button>
         <TextBlock Text="{Binding FileText}"/>
     </StackPanel>

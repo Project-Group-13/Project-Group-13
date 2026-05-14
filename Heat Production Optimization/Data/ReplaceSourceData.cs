@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Heat_Production_Optimization.Model;
+using Heat_Production_Optimization.Models;
 
 namespace Heat_Production_Optimization.Data;
 
-public static class ReplaceCSVData
+public static class ReplaceSourceData
 {
     public static void ReplaceAll(List<SourceData> data)
     {

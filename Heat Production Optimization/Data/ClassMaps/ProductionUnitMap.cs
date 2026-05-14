@@ -1,25 +1,7 @@
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using CsvHelper;
 using CsvHelper.Configuration;
 using Heat_Production_Optimization.Models;
 
 namespace Heat_Production_Optimization.Data;
-
-public static class ProductionUnitParser
-{
-    public static List<ProductionUnit> Parse(Stream stream)
-    {
-        using var reader = new StreamReader(stream);
-        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-        csv.Context.RegisterClassMap<ProductionUnitMap>();
-
-        return csv.GetRecords<ProductionUnit>().ToList();
-    }
-}
 
 public sealed class ProductionUnitMap : ClassMap<ProductionUnit>
 {

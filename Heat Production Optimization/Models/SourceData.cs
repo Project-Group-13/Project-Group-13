@@ -1,6 +1,6 @@
 using System;
 
-namespace Heat_Production_Optimization.Model;
+namespace Heat_Production_Optimization.Models;
 
 public class SourceData(DateTime timeFrom, DateTime timeTo, double heatDemand, double electricityPrice, string period)
 {

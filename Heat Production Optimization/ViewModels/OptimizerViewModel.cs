@@ -11,8 +11,7 @@ namespace Heat_Production_Optimization.ViewModels;
 public partial class OptimizerViewModel : ViewModelBase
 {
     private readonly Optimizer _optimizer = new();
-    private readonly OptimizerHeatDemand _heatDemandRepo = new();
-    private readonly GraphDataRepository _unitRepo = new();
+    private readonly GraphDataRepository _dataRepo = new();
 
     public List<int> Years { get; } = new List<int> { 2025, 2026 };
     public List<int> Months { get; } = Enumerable.Range(1, 12).ToList();
@@ -68,13 +67,13 @@ public partial class OptimizerViewModel : ViewModelBase
         var date = new DateTime(SelectedYear, SelectedMonth, SelectedDay);
 
         // Heat demand from database
-        var heatDemands = _heatDemandRepo.GetHeatDemandForDay(date);
+        var heatDemands = _dataRepo.GetHeatDemandForDay(date);
         double heatDemand = heatDemands[SelectedHour];
 
         HeatDemandText = $"Heat Demand: {heatDemand:F2} MWh";
 
         // Production units (convert to List for the optimizer)
-        var units = _unitRepo.GetProductionUnits().ToList();
+        var units = _dataRepo.GetProductionUnits().ToList();
             
 
         // HourSlot (no minutes, no seconds)

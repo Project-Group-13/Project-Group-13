@@ -25,7 +25,6 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
     private string selectedGraph = "Heat Production Over Time";
 
     private readonly GraphDataRepository _graphDataRepository = new();
-    private readonly OptimizerHeatDemand _heatDemandRepo = new();
     private readonly Optimizer _optimizer = new();
 
     private List<DateOnly> _availableDates = new();
@@ -355,7 +354,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
             return;
         }
 
-        var heatDemands = _heatDemandRepo.GetHeatDemandForDay(date);
+        var heatDemands = _graphDataRepository.GetHeatDemandForDay(date);
         if (heatDemands.Count == 0 || heatDemands.All(value => value <= 0))
         {
             SetNoDataState("No Heat Demand Data For Date");
