@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Heat_Production_Optimization.Models;
 
@@ -53,7 +54,7 @@ public static class ReplaceSourceData
             timeFrom.Value = row.TimeFrom;
             timeTo.Value = row.TimeTo;
             heatDemand.Value = row.HeatDemand;
-            electricityPrice.Value = row.ElectricityPrice;
+            electricityPrice.Value = DBNull.Value;
             insertCommand.ExecuteNonQuery();
         }
 

@@ -13,7 +13,6 @@ public sealed class SourceDataMap : ClassMap<SourceData>
         Parameter("timeFrom").Name("Time from").TypeConverterOption.Format("dd.MM.yyyy HH:mm");;
         Parameter("timeTo").Name("Time to").TypeConverterOption.Format("dd.MM.yyyy HH:mm");;
         Parameter("heatDemand").Name("Heat Demand");
-        Parameter("electricityPrice").Name("Electricity Price");
         Parameter("period").Name("Period");
     }
 }

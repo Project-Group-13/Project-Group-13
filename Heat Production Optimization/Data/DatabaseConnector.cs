@@ -24,10 +24,10 @@ public class DatabaseConnector
     {
         var candidates = new List<string>
         {
-            Path.Combine(AppContext.BaseDirectory, "Data", "database.db"),
-            Path.Combine(AppContext.BaseDirectory, "database.db"),
             Path.Combine(Environment.CurrentDirectory, "Data", "database.db"),
-            Path.Combine(Environment.CurrentDirectory, "database.db")
+            Path.Combine(Environment.CurrentDirectory, "database.db"),
+            Path.Combine(AppContext.BaseDirectory, "Data", "database.db"),
+            Path.Combine(AppContext.BaseDirectory, "database.db")
         };
 
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

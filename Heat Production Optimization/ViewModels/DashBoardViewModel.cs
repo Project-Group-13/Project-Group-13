@@ -22,7 +22,13 @@ public partial class DashBoardViewModel : ViewModelBase
 
     [RelayCommand]
     private async Task UploadSourceDataFile(CancellationToken token)
-        => await UploadFile(CSVParser.Parse<SourceData, SourceDataMap>, ReplaceSourceData.ReplaceAll, token);
+    {
+        await UploadFile(CSVParser.Parse<SourceData, SourceDataMap>, ReplaceSourceData.ReplaceAll, token);
+
+        var apiService = App.Current?.Services?.GetService<APIService>();
+
+        if(apiService != null) _ = apiService.LoadData();
+    }
 
     [RelayCommand]
     private async Task UploadUnitsFile(CancellationToken token)

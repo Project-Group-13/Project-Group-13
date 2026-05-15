@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -7,7 +6,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 
 
-namespace Heat_Production_Optimization.Data;
+namespace Heat_Production_Optimization.Services;
 
 public class CSVParser
 {
