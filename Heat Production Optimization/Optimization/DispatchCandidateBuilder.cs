@@ -7,15 +7,15 @@ namespace Heat_Production_Optimization.Optimization
     {
         public static List<DispatchCandidate> Build(IEnumerable<ProductionUnit> units, HourSlot hour, double electricityPrice)
         {
-            var result = new List<DispatchCandidate>();
+            var candidates = new List<DispatchCandidate>();
 
             foreach (var unit in units)
             {
                 double netCost = NetProductionCostCalculator.ComputeNetProductionCost(unit, hour, electricityPrice);
 
-                result.Add(new DispatchCandidate(unit, netCost));
+                candidates.Add(new DispatchCandidate(unit, netCost));
             }
-            return result;
+            return candidates;
         }
     }
 }

@@ -2,19 +2,21 @@ namespace Heat_Production_Optimization.Models
 {
     public class ProductionUnit
     {
+        public int UnitId { get; set; }
         public string Name { get; set; } = "";
 
         public double MaxHeat { get; set; }      // MW
         public double ProductionCost { get; set; } // DkK/MWh
-        public double Co2Emissions { get; set; }  // kg/MWh
+        public double? Co2Emissions { get; set; }  // kg/MWh
 
-        public ProductionUnitType UnitType { get; set; }
+        public double? EnergyRate { get; set; }
+        public double? MaxElectricity { get; set; }
 
-        //Electricity produced per MWh heat
-        public double ElectricityProducedPerHeat { get; set; }
+        public string EnergyType { get; set; } = "";
+        public string ImagePath { get; set; } = "";
+        public int? GridId { get; set; }
 
-        // Electricity consumed per MWh heat
-        public double ElectricityConsumedPerHeat { get; set; }
+        public string UnitType { get; set; } = "";
     }
 
 }

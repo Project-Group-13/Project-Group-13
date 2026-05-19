@@ -6,20 +6,16 @@ namespace Heat_Production_Optimization.Optimization
     {
         public static double ComputeNetProductionCost(ProductionUnit unit, HourSlot hour, double electricityPrice)
         {
-            switch (unit.UnitType)
+            if(unit.UnitType == "CHP")
             {
-                case ProductionUnitType.HeatOnlyBoiler:
-                    return unit.ProductionCost;
-
-                case ProductionUnitType.CHP:
-                    return unit.ProductionCost - unit.ElectricityProducedPerHeat * electricityPrice;
-
-                case ProductionUnitType.ElectricBoiler:
-                    return unit.ProductionCost + unit.ElectricityConsumedPerHeat * electricityPrice;
-
-                default:
-                    return unit.ProductionCost;
+                return unit.ProductionCost - (unit.EnergyRate ?? 0) * electricityPrice;
             }
+            else if(unit.UnitType == "ElectricBoiler")
+            {
+                return unit.ProductionCost + (unit.EnergyRate ?? 0) * electricityPrice;
+            }
+
+            return unit.ProductionCost;
         }
     }
 }

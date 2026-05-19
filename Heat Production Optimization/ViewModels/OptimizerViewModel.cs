@@ -71,6 +71,7 @@ public partial class OptimizerViewModel : ViewModelBase
         // Heat demand from database
         var heatDemands = _heatDemandRepo.GetHeatDemandForDay(date);
         double heatDemand = heatDemands[SelectedHour];
+
         HeatDemandText = $"Heat Demand: {heatDemand:F2} MWh";
 
         double electricityPrice = 
@@ -91,7 +92,11 @@ public partial class OptimizerViewModel : ViewModelBase
         );
 
         // Run optimizer (Scenario 1)
-        Results = _optimizer.Optimize(heatDemand, units, hour, electricityPrice);
+        Results = _optimizer.Optimize(
+            heatDemand, 
+            units, 
+            hour, 
+            electricityPrice);
     }
 
 }
