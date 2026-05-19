@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.Input;
-using Heat_Production_Optimization.Models;
 using Heat_Production_Optimization.Data;
+using Heat_Production_Optimization.Models;
 using Heat_Production_Optimization.Optimization;
 
 namespace Heat_Production_Optimization.ViewModels;
@@ -17,6 +17,7 @@ public partial class OptimizerViewModel : ViewModelBase
     public List<int> Years { get; } = new List<int> { 2025, 2026 };
     public List<int> Months { get; } = Enumerable.Range(1, 12).ToList();
     public List<int> Days { get; } = Enumerable.Range(1, 31).ToList();
+    public List<int> Hours { get; } = Enumerable.Range(0, 24).ToList();
 
     private int _selectedYear = 2026;
     public int SelectedYear
@@ -38,8 +39,8 @@ public partial class OptimizerViewModel : ViewModelBase
         get => _selectedDay;
         set => SetProperty(ref _selectedDay, value);
     }
+
     public int SelectedHour { get; set; } = 0;
-    public List<int> Hours { get; } = Enumerable.Range(0, 24).ToList();
 
     private string _heatDemandText = "No data yet.";
     public string HeatDemandText
@@ -73,9 +74,16 @@ public partial class OptimizerViewModel : ViewModelBase
 
         HeatDemandText = $"Heat Demand: {heatDemand:F2} MWh";
 
-        // Production units (convert to List for the optimizer)
+        double electricityPrice = 
+            _unitRepo
+                .GetElectricityPriceSeries()
+                .First(p => 
+                    p.Timestamp.Date == date.Date && 
+                    p.Timestamp.Hour == SelectedHour)
+                .Value;
+
+        // Production units
         var units = _unitRepo.GetProductionUnits().ToList();
-            
 
         // HourSlot (no minutes, no seconds)
         var hour = new HourSlot(
@@ -84,7 +92,11 @@ public partial class OptimizerViewModel : ViewModelBase
         );
 
         // Run optimizer (Scenario 1)
-        Results = _optimizer.Optimize(heatDemand, units, hour);
+        Results = _optimizer.Optimize(
+            heatDemand, 
+            units, 
+            hour, 
+            electricityPrice);
     }
 
 }
