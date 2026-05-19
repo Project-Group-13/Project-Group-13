@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:viewModels="clr-namespace:Heat_Production_Optimization.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+        x:Class="Heat_Production_Optimization.Views.UnitsView"
+        x:CompileBindings="False">
+
+    <Design.DataContext>
+        <viewModels:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <StackPanel Margin="0" Spacing="16">
+        <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Production Units" FontSize="20" FontWeight="Bold" Foreground="#111827"/>
+                <TextBlock Text="Click a card to open the details window." Foreground="#4B5563" FontSize="14"/>
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="{Binding AllUnits.Count, StringFormat=\'Units: {0}\'}" VerticalAlignment="Center" Foreground="#6B7280" FontSize="14"/>
+        </Grid>
+        <ItemsControl ItemsSource="{Binding AllUnits}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Width="340" Margin="12" CornerRadius="20" Background="#FFFFFF" BorderBrush="#E5E7EB" BorderThickness="1">
+                        <Grid RowDefinitions="200,Auto" MinHeight="390">
+                            <Button Grid.Row="0"
+                                Classes="unit-card-button"
+                                    Command="{Binding DataContext.UnitsViewModel.OpenUnitDetailsCommand, RelativeSource={RelativeSource AncestorType=TabControl}}"
+                                    CommandParameter="{Binding}"
+                                    Padding="0"
+                                    BorderThickness="0"
+                                    Background="Transparent">
+                                <Grid>
+                                    <Border CornerRadius="20,20,0,0" Background="#F3F4F6" />
+                                    <Grid>
+                                        <Image Source="{Binding Image}" Stretch="UniformToFill" />
+                                        <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12" CornerRadius="999" Background="#D0021B" Padding="10,5">
+                                            <TextBlock Text="{Binding Enabled, StringFormat=Status: {0}}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12" CornerRadius="999" Background="#111827CC" Padding="10,5">
+                                            <TextBlock Text="View details" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </Button>
+                            <Border Grid.Row="1" Padding="18">
+                                <StackPanel Spacing="12">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="Bold" Foreground="#111827" />
+                                        <TextBlock Text="{Binding ProductionCost, StringFormat={}{0:F2} DKK/MWh}" Foreground="#6B7280" FontSize="14" />
+                                    </StackPanel>
+                                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="12">
+                                        <TextBlock Text="Heat" Foreground="#6B7280" FontSize="13" />
+                                        <TextBlock Grid.Column="1" Text="{Binding MaxHeat, StringFormat={}{0:F0} MW}" FontWeight="SemiBold" HorizontalAlignment="Right" Foreground="#111827" />
+                                        <TextBlock Grid.Row="1" Text="CO2" Foreground="#6B7280" FontSize="13" />
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Co2Emissions, StringFormat={}{0:F1} kg/MWh}" FontWeight="SemiBold" HorizontalAlignment="Right" Foreground="#111827" />
+                                    </Grid>
+
+                                    <ToggleButton Classes="unit-card-toggle"
+                                                  IsChecked="{Binding Enabled, Mode=TwoWay}"
+                                                  Content="Enable / Disable"
+                                                  HorizontalAlignment="Stretch"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Padding="12,10"
+                                                  FontWeight="SemiBold"
+                                                  PointerEntered="UnitCardToggle_PointerEntered"
+                                                  PointerExited="UnitCardToggle_PointerExited"
+                                                  Checked="UnitCardToggle_CheckedChanged"
+                                                  Unchecked="UnitCardToggle_CheckedChanged" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>
