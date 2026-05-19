@@ -205,7 +205,6 @@ public sealed class GraphDataRepository
             || TryGetOrdinal(reader, "Co2Rate", out co2Ordinal)
             || TryGetOrdinal(reader, "CO2Rate", out co2Ordinal);
         TryGetOrdinal(reader, "ImagePath", out var imagePathOrdinal);
-        TryGetOrdinal(reader, "MaxElectricity", out var maxElectricityOrdinal);
 
 
         while (reader.Read())
@@ -220,24 +219,14 @@ public sealed class GraphDataRepository
             var productionCost = productionCostOrdinal >= 0 ? ParseDouble(reader.GetValue(productionCostOrdinal)) : double.NaN;
             var imagePath = imagePathOrdinal >= 0 ? Convert.ToString(reader.GetValue(imagePathOrdinal), CultureInfo.InvariantCulture) : string.Empty;
             var co2 = hasCo2 && co2Ordinal >= 0 ? ParseDouble(reader.GetValue(co2Ordinal)) : double.NaN;
-            var maxElectricity = maxElectricityOrdinal >= 0 ? ParseDouble(reader.GetValue(maxElectricityOrdinal)) : double.NaN;
-
-            string unitType = unitName switch
-            {
-                "GM1" => "CHP",
-                "EB1" => "Electricboiler",
-                _ => "HeatOnly"
-            };
 
             data.Add(new ProductionUnit
             {
-                UnitType = unitType,
                 Name = unitName,
                 MaxHeat = double.IsNaN(maxHeat) ? 0 : maxHeat,
                 ProductionCost = double.IsNaN(productionCost) ? 0 : productionCost,
                 Co2Emissions = double.IsNaN(co2) ? 0 : co2,
-                ImagePath = imagePath ?? string.Empty,
-                MaxElectricity = double.IsNaN(maxElectricity) ? null : maxElectricity
+                ImagePath = imagePath ?? string.Empty
             });
         }
 
