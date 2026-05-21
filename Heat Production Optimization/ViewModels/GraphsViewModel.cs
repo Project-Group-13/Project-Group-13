@@ -381,7 +381,15 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
                 continue;
             }
 
-            var results = _optimizer.Optimize(demand, units.ToList(), new HourSlot(dateOnly, hour));
+            double electricityPrice = 0;
+
+            var results = _optimizer.Optimize(
+                demand, 
+                units.ToList(),
+                new HourSlot(dateOnly, hour), 
+                electricityPrice
+            );
+
             foreach (var result in results)
             {
                 if (unitSeries.TryGetValue(result.UnitName, out var values))

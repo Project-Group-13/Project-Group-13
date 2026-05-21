@@ -1,7 +1,7 @@
-UnitId,UnitName,MaxHeat,ProductionCost,CO2Rate,EnergyRate,MaxElectricity,EnergyType,ImagePath,GridId
-1,GB1,3,510,132,1.05,,gas,Assets/ProductionUnits/GasBoiler.jpg,1
-2,GB2,2,540,134,1.08,,gas,Assets/ProductionUnits/GasBoiler.jpg,1
-3,GB3,4,580,136,1.09,,gas,Assets/ProductionUnits/GasBoiler.jpg,1
-4,OB1,6,690,147,1.18,,oil,Assets/ProductionUnits/OilBoiler.jpg,1
-5,GM1,5.3,975,227,1.82,3.9,gas,Assets/ProductionUnits/GasMotor.jpg,1
-6,EB1,6,15,,,-6,electricity,Assets/ProductionUnits/ElectricBoiler.jpg,1
+UnitId,UnitName,MaxHeat,ProductionCost,CO2Rate,EnergyRate,MaxElectricity,EnergyType,ImagePath,GridId,UnitType
+1,GB1,3,510,132,1.05,,gas,Assets/ProductionUnits/GasBoiler.jpg,1,Boiler
+2,GB2,2,540,134,1.08,,gas,Assets/ProductionUnits/GasBoiler.jpg,1,Boiler
+3,GB3,4,580,136,1.09,,gas,Assets/ProductionUnits/GasBoiler.jpg,1,Boiler
+4,OB1,6,690,147,1.18,,oil,Assets/ProductionUnits/OilBoiler.jpg,1,Boiler
+5,GM1,5.3,975,227,1.82,3.9,gas,Assets/ProductionUnits/GasMotor.jpg,1,CHP
+6,EB1,6,15,,,-6,electricity,Assets/ProductionUnits/ElectricBoiler.jpg,1,ElectricBoiler

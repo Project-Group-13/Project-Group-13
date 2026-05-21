@@ -9,12 +9,13 @@ namespace Heat_Production_Optimization.Optimization
         public List<OptimizerResult> Optimize(
             double heatDemand,
             List<ProductionUnit> units,
-            HourSlot hour)
+            HourSlot hour,
+            double electricityPrice)
         {
             var results = new List<OptimizerResult>();
 
             var orderedUnits =
-                CostBasedDispatcher.GetDispatchOrderForHour(units, hour);
+                CostBasedDispatcher.GetDispatchOrderForHour(units, hour, electricityPrice);
 
             double remainingDemand = heatDemand;
 
