@@ -96,7 +96,7 @@
         </Border>
 
         <!-- Main content -->
-        <ScrollViewer Grid.Row="1" Padding="20" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <Border Grid.Row="1" Padding="20">
             <Border Background="White" CornerRadius="14" Padding="20">
                 <TabControl>
                     <TabItem Header="Dashboard">                                                                                                                                                                                                            
@@ -111,6 +111,6 @@
                     </TabItem>
                 </TabControl>
             </Border>
-        </ScrollViewer>
+        </Border>
     </Grid>
 </Window>

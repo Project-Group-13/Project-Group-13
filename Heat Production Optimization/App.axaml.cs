@@ -3,7 +3,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
-using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Styling;
+using Avalonia.Themes.Fluent;
 using Heat_Production_Optimization.ViewModels;
 using Heat_Production_Optimization.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +18,13 @@ public partial class App : Application
 {
     public override void Initialize()
     {
-        AvaloniaXamlLoader.Load(this);
+        RequestedThemeVariant = ThemeVariant.Default;
+        DataTemplates.Add(new ViewLocator());
+        Styles.Add(new FluentTheme());
+        Styles.Add(new StyleInclude(new Uri("avares://Heat_Production_Optimization/"))
+        {
+            Source = new Uri("avares://Heat_Production_Optimization/Styles/Theme.axaml")
+        });
     }
 
     public override void OnFrameworkInitializationCompleted()

@@ -373,7 +373,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
         var unitSeries = unitNames.ToDictionary(name => name, _ => new double[24]);
         var dateOnly = new DateOnly(SelectedYear, SelectedMonth, SelectedDay);
 
-        for (var hour = 0; hour < 24; hour++)
+        for (var hour = 0; hour < 24; hour++) 
         {
             var demand = hour < heatDemands.Count ? heatDemands[hour] : 0;
             if (demand <= 0)
