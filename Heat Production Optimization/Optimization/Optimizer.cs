@@ -13,11 +13,9 @@ namespace Heat_Production_Optimization.Optimization
         {
             var results = new List<OptimizerResult>();
 
-            // Task 4.2: cost-based dispatch order
             var orderedUnits =
                 CostBasedDispatcher.GetDispatchOrderForHour(units, hour);
 
-            // Task 4.1: heat allocation
             double remainingDemand = heatDemand;
 
             foreach (var unit in orderedUnits)
