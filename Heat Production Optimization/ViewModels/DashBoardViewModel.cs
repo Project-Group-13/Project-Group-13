@@ -200,7 +200,15 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
         }
 
         var hourSlot = new HourSlot(dateOnly, SelectedHour);
-        var results = _optimizer.Optimize(HeatDemand, units, hourSlot);
+
+        double electricityPrice = 0;
+
+        var results = _optimizer.Optimize(
+            HeatDemand, 
+            units, 
+            hourSlot, 
+            electricityPrice
+        );
 
         var summaries = new ObservableCollection<DashboardUnitResult>();
         var totalHeat = 0d;
@@ -218,7 +226,12 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
                 continue;
             }
 
-            var costRate = NetProductionCostCalculator.ComputeNetProductionCost(unit, hourSlot);
+            var costRate = NetProductionCostCalculator.ComputeNetProductionCost(
+                unit, 
+                hourSlot, 
+                electricityPrice
+            );
+
             var netCost = result.HeatProduced * costRate;
             var co2 = result.HeatProduced * (unit.Co2Emissions ?? 0);
 
