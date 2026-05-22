@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Heat_Production_Optimization.Models;
 
@@ -10,9 +11,16 @@ namespace Heat_Production_Optimization.Optimization
             double heatDemand,
             List<ProductionUnit> units,
             HourSlot hour,
-            double electricityPrice)
+            double electricityPrice,
+            List<MaintenancePeriod> maintenancePeriods)
         {
             var results = new List<OptimizerResult>();
+
+            var currentHour = new DateTime(hour.Date.Year, hour.Date.Month, hour.Date.Day, hour.Hour, 0, 0);
+            
+            units = units.Where(u => !maintenancePeriods.Any(m => 
+                m.UnitName == u.Name && m.IsUnderMaintenance(currentHour)
+            )).ToList();
 
             var orderedUnits =
                 CostBasedDispatcher.GetDispatchOrderForHour(units, hour, electricityPrice);

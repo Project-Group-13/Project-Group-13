@@ -387,7 +387,9 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
                 demand, 
                 units.ToList(),
                 new HourSlot(dateOnly, hour), 
-                electricityPrice
+                electricityPrice,
+                MaintenanceSchedule.GetSchedule()
+
             );
 
             foreach (var result in results)
