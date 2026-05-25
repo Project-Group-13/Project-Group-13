@@ -185,7 +185,8 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
 
         var hourSlot = new HourSlot(dateOnly, SelectedHour);
 
-        double electricityPrice = 0;
+        double electricityPrice =
+            _graphDataRepository.GetElectricityPriceForHour(dateOnly, SelectedHour);
 
         var results = _optimizer.Optimize(
             HeatDemand, 
