@@ -118,6 +118,29 @@ public sealed class GraphDataRepository
         return data;
     }
 
+    public double GetElectricityPriceForHour(DateOnly date, int hour)
+    {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = @"
+            SELECT ElectricityPrice
+            FROM SourceData
+            WHERE TimeFrom IS NOT NULL
+            AND ElectricityPrice IS NOT NULL
+            AND date(TimeFrom) = $date
+            AND strftime('%H', TimeFrom) = $hour
+            LIMIT 1;";
+
+        command.Parameters.AddWithValue("$date", date.ToString("yyyy-MM-dd"));
+        command.Parameters.AddWithValue("$hour", hour.ToString("D2"));
+
+        var result = command.ExecuteScalar();
+
+        return result != null ? Convert.ToDouble(result) : 0;
+    }
+
     public IReadOnlyList<HeatPoint> GetEstimatedDailyCostSeries(int maxPoints = 60)
     {
         var data = new List<HeatPoint>();
@@ -193,6 +216,7 @@ public sealed class GraphDataRepository
             ORDER BY UnitName;";
 
         using var reader = command.ExecuteReader();
+
         if (!TryGetOrdinal(reader, "UnitName", out var unitNameOrdinal))
         {
             return data;
@@ -206,10 +230,14 @@ public sealed class GraphDataRepository
             || TryGetOrdinal(reader, "CO2Rate", out co2Ordinal);
         TryGetOrdinal(reader, "ImagePath", out var imagePathOrdinal);
 
+        TryGetOrdinal(reader, "EnergyRate", out var energyRateOrdinal);
+        TryGetOrdinal(reader, "MaxElectricity", out var maxElectricityOrdinal);
+        TryGetOrdinal(reader, "UnitType", out var unitTypeOrdinal);
 
         while (reader.Read())
         {
             var unitName = Convert.ToString(reader.GetValue(unitNameOrdinal), CultureInfo.InvariantCulture);
+
             if (string.IsNullOrWhiteSpace(unitName))
             {
                 continue;
@@ -220,12 +248,19 @@ public sealed class GraphDataRepository
             var imagePath = imagePathOrdinal >= 0 ? Convert.ToString(reader.GetValue(imagePathOrdinal), CultureInfo.InvariantCulture) : string.Empty;
             var co2 = hasCo2 && co2Ordinal >= 0 ? ParseDouble(reader.GetValue(co2Ordinal)) : double.NaN;
 
+            var energyRate = energyRateOrdinal >= 0 ? ParseDouble(reader.GetValue(energyRateOrdinal)) : double.NaN;
+            var maxElectricity = maxElectricityOrdinal >= 0 ? ParseDouble(reader.GetValue(maxElectricityOrdinal)) : double.NaN;
+            var unitType = unitTypeOrdinal >= 0 ? Convert.ToString(reader.GetValue(unitTypeOrdinal), CultureInfo.InvariantCulture) : "";
+
             data.Add(new ProductionUnit
             {
                 Name = unitName,
                 MaxHeat = double.IsNaN(maxHeat) ? 0 : maxHeat,
                 ProductionCost = double.IsNaN(productionCost) ? 0 : productionCost,
                 Co2Emissions = double.IsNaN(co2) ? 0 : co2,
+                EnergyRate = double.IsNaN(energyRate) ? 0 : energyRate,
+                MaxElectricity = double.IsNaN(energyRate) ? 0 : energyRate,
+                UnitType = unitType ?? "",
                 ImagePath = imagePath ?? string.Empty
             });
         }

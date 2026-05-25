@@ -35,5 +35,6 @@ public sealed class ProductionUnitMap : ClassMap<ProductionUnit>
         Map(m => m.EnergyType).Name("EnergyType");
         Map(m => m.ImagePath).Name("ImagePath");
         Map(m => m.GridId).Name("GridId");
+        Map(m => m.UnitType).Name("UnitType");
     }
 }

@@ -23,8 +23,8 @@ public static class ReplaceProductionUnitsData
         using var insertCommand = conn.CreateCommand();
         insertCommand.Transaction = transaction;
         insertCommand.CommandText = @"
-            INSERT INTO ProductionUnits (UnitId, UnitName, MaxHeat, ProductionCost, CO2Rate, EnergyRate, MaxElectricity, EnergyType, ImagePath, GridId)
-            VALUES ($unitId, $unitName, $maxHeat, $productionCost, $co2Rate, $energyRate, $maxElectricity, $energyType, $imagePath, $gridId);";
+            INSERT INTO ProductionUnits (UnitId, UnitName, MaxHeat, ProductionCost, CO2Rate, EnergyRate, MaxElectricity, EnergyType, ImagePath, GridId, UnitType)
+            VALUES ($unitId, $unitName, $maxHeat, $productionCost, $co2Rate, $energyRate, $maxElectricity, $energyType, $imagePath, $gridId, $unitType);";
 
         var unitId = insertCommand.CreateParameter();
         unitId.ParameterName = "$unitId";
@@ -66,6 +66,10 @@ public static class ReplaceProductionUnitsData
         gridId.ParameterName = "$gridId";
         insertCommand.Parameters.Add(gridId);
 
+        var unitType = insertCommand.CreateParameter();
+        unitType.ParameterName = "$unitType";
+        insertCommand.Parameters.Add(unitType);
+
         foreach (var unit in data)
         {
             unitId.Value = unit.UnitId;
@@ -78,6 +82,7 @@ public static class ReplaceProductionUnitsData
             energyType.Value = unit.EnergyType;
             imagePath.Value = unit.ImagePath is not null ? unit.ImagePath : DBNull.Value;
             gridId.Value = unit.GridId.HasValue ? unit.GridId.Value : DBNull.Value;
+            unitType.Value = unit.UnitType ?? "";
             insertCommand.ExecuteNonQuery();
         }
 

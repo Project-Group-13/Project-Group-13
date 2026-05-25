@@ -1,4 +1,5 @@
 ﻿using Heat_Production_Optimization.Models;
+using System;
 
 namespace Heat_Production_Optimization.Optimization
 {
@@ -8,13 +9,15 @@ namespace Heat_Production_Optimization.Optimization
         {
             if(unit.UnitType == "CHP")
             {
-                return unit.ProductionCost
-                    - (unit.EnergyRate ?? 0) * electricityPrice;
+                var cost = unit.ProductionCost - (unit.EnergyRate ?? 0) * electricityPrice;
+
+                cost += 210;
+
+                return Math.Max(cost, -200);
             }
             else if(unit.UnitType == "ElectricBoiler")
             {
-                return unit.ProductionCost
-                    + (unit.EnergyRate ?? 0) * electricityPrice;
+                return unit.ProductionCost + (unit.EnergyRate ?? 0) * electricityPrice;
             }
 
             return unit.ProductionCost;

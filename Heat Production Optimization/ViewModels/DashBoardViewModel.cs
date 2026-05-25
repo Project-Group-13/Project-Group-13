@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -117,6 +118,9 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
             {
                 await using var readStream = await file.OpenReadAsync();
                 var data = CSVParser.Parse(readStream);
+
+                DatabaseInitializer.EnsureCreated();
+
                 ReplaceCSVData.ReplaceAll(data);
                 WeakReferenceMessenger.Default.Send(new CSVUploadedMessage());
             }
@@ -146,6 +150,9 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
             {
                 await using var readStream = await file.OpenReadAsync();
                 var data = ProductionUnitParser.Parse(readStream);
+
+                DatabaseInitializer.EnsureCreated();
+
                 ReplaceProductionUnitsData.ReplaceAll(data);
                 WeakReferenceMessenger.Default.Send(new CSVUploadedMessage());
             }
@@ -159,7 +166,7 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
             Console.WriteLine(e.Message);
         }
     }
-
+    
     private void RefreshDashboard()
     {
         if (!TryBuildSelectedDate(out var date, out var dateOnly))
@@ -201,7 +208,8 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
 
         var hourSlot = new HourSlot(dateOnly, SelectedHour);
 
-        double electricityPrice = 0;
+        double electricityPrice =
+            _graphDataRepository.GetElectricityPriceForHour(dateOnly, SelectedHour);
 
         var results = _optimizer.Optimize(
             HeatDemand, 
@@ -225,6 +233,10 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
             {
                 continue;
             }
+
+            File.AppendAllText("debug.txt",
+                $"UNIT: {unit.Name}, TYPE: {unit.UnitType}, RATE: {unit.EnergyRate}\n");
+
 
             var costRate = NetProductionCostCalculator.ComputeNetProductionCost(
                 unit, 

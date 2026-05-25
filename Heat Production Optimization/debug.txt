@@ -1,0 +1,6 @@
+UNIT: EB1, TYPE: ElectricBoiler, RATE: -1
+UNIT: GM1, TYPE: CHP, RATE: 1.82
+UNIT: EB1, TYPE: ElectricBoiler, RATE: -1
+UNIT: GM1, TYPE: CHP, RATE: 1.82
+UNIT: EB1, TYPE: ElectricBoiler, RATE: -1
+UNIT: GM1, TYPE: CHP, RATE: 1.82
