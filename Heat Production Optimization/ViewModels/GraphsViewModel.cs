@@ -25,7 +25,9 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
     private string selectedGraph = "Heat Production Over Time";
 
     private readonly GraphDataRepository _graphDataRepository = new();
+    private readonly GraphDataRepository _heatDemandRepo = new();
     private readonly Optimizer _optimizer = new();
+    private readonly List<MaintenancePeriod> _maintenancePeriod = new();
 
     private List<DateOnly> _availableDates = new();
     private bool _suppressDateUpdates;
@@ -354,7 +356,8 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
             return;
         }
 
-        var heatDemands = _graphDataRepository.GetHeatDemandForDay(date);
+        var heatDemands = _heatDemandRepo.GetHeatDemandForDay(date);
+
         if (heatDemands.Count == 0 || heatDemands.All(value => value <= 0))
         {
             SetNoDataState("No Heat Demand Data For Date");
@@ -372,7 +375,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
         var unitSeries = unitNames.ToDictionary(name => name, _ => new double[24]);
         var dateOnly = new DateOnly(SelectedYear, SelectedMonth, SelectedDay);
 
-        for (var hour = 0; hour < 24; hour++) 
+        for (var hour = 0; hour < 24; hour++)
         {
             var demand = hour < heatDemands.Count ? heatDemands[hour] : 0;
             if (demand <= 0)
@@ -384,12 +387,11 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
                 _graphDataRepository.GetElectricityPriceForHour(dateOnly, hour);
 
             var results = _optimizer.Optimize(
-                demand, 
+                demand,
                 units.ToList(),
-                new HourSlot(dateOnly, hour), 
+                new HourSlot(dateOnly, hour),
                 electricityPrice,
-                MaintenanceSchedule.GetSchedule()
-
+                _maintenancePeriod
             );
 
             foreach (var result in results)
@@ -464,7 +466,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
     {
         UpdateSeries();
     }
-    
+
     private void RefreshAvailableDates()
     {
         _availableDates = _graphDataRepository.GetAvailableHeatDemandDates().ToList();

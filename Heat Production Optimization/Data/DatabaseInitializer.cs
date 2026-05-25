@@ -39,7 +39,8 @@ public static class DatabaseInitializer
                 MaxElectricity DECIMAL(4, 1),
                 EnergyType     TEXT NOT NULL,
                 ImagePath      TEXT,
-                GridId         INTEGER
+                GridId         INTEGER,
+                UnitType       TEXT
             );";
 
         command.ExecuteNonQuery();

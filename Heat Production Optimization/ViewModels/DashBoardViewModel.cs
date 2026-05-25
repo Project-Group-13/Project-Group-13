@@ -106,6 +106,8 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
     {
         await UploadFile(CSVParser.Parse<SourceData, SourceDataMap>, ReplaceSourceData.ReplaceAll, token);
 
+        DatabaseInitializer.EnsureCreated();
+
         var apiService = App.Current?.Services?.GetService<APIService>();
 
         if(apiService != null) _ = apiService.LoadData();
@@ -130,6 +132,9 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
             {
                 await using var readStream = await file.OpenReadAsync();
                 var data = parser(readStream);
+
+                DatabaseInitializer.EnsureCreated();
+
                 replacer(data);
                 WeakReferenceMessenger.Default.Send(new CSVUploadedMessage());
             }

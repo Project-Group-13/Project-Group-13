@@ -295,7 +295,7 @@ public sealed class GraphDataRepository
                 ProductionCost = double.IsNaN(productionCost) ? 0 : productionCost,
                 Co2Emissions = double.IsNaN(co2) ? 0 : co2,
                 EnergyRate = double.IsNaN(energyRate) ? 0 : energyRate,
-                MaxElectricity = double.IsNaN(energyRate) ? 0 : energyRate,
+                MaxElectricity = double.IsNaN(maxElectricity) ? 0 : maxElectricity,
                 UnitType = unitType ?? "",
                 ImagePath = imagePath ?? string.Empty
             });
