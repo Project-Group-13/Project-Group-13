@@ -131,6 +131,7 @@ public sealed class GraphDataRepository
             AND ElectricityPrice IS NOT NULL
             AND date(TimeFrom) = $date
             AND strftime('%H', TimeFrom) = $hour
+            ORDER BY TimeFrom
             LIMIT 1;";
 
         command.Parameters.AddWithValue("$date", date.ToString("yyyy-MM-dd"));
