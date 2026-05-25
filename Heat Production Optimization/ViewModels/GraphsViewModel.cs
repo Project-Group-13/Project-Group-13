@@ -382,7 +382,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
             }
 
             double electricityPrice = 
-                _graphDataRepository.GetElectricityPriceForHour(dateOnly, hour); ;
+                _graphDataRepository.GetElectricityPriceForHour(dateOnly, hour);
 
             var results = _optimizer.Optimize(
                 demand, 
