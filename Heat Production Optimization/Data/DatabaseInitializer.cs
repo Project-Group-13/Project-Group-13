@@ -44,5 +44,28 @@ public static class DatabaseInitializer
             );";
 
         command.ExecuteNonQuery();
+
+        using var tableInfoCommand = connection.CreateCommand();
+        tableInfoCommand.CommandText = "PRAGMA table_info(ProductionUnits);";
+
+        var hasUnitTypeColumn = false;
+        using (var reader = tableInfoCommand.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                if (reader.GetString(1) == "UnitType")
+                {
+                    hasUnitTypeColumn = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasUnitTypeColumn)
+        {
+            using var alterTableCommand = connection.CreateCommand();
+            alterTableCommand.CommandText = "ALTER TABLE ProductionUnits ADD COLUMN UnitType TEXT;";
+            alterTableCommand.ExecuteNonQuery();
+        }
     }
 }
