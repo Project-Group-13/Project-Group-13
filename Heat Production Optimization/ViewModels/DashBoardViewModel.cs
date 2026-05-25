@@ -119,8 +119,6 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
                 await using var readStream = await file.OpenReadAsync();
                 var data = CSVParser.Parse(readStream);
 
-                DatabaseInitializer.EnsureCreated();
-
                 ReplaceCSVData.ReplaceAll(data);
                 WeakReferenceMessenger.Default.Send(new CSVUploadedMessage());
             }
