@@ -17,7 +17,7 @@ public static class DatabaseInitializer
                 TimeFrom         DATETIME NOT NULL,
                 TimeTo           DATETIME NOT NULL,
                 HeatDemand       DECIMAL(5, 3) NOT NULL,
-                ElectricityPrice DECIMAL(7, 3) NOT NULL,
+                ElectricityPrice DECIMAL(7, 3),
                 UNIQUE (PeriodType, TimeFrom)
             );
 

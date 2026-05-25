@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Heat_Production_Optimization.Models;
 using Microsoft.Data.Sqlite;
+using Tmds.DBus.Protocol;
 
 namespace Heat_Production_Optimization.Data;
 
@@ -12,14 +13,14 @@ public sealed class GraphDataRepository
 
     public IReadOnlyList<HeatPoint> GetHeatDemandSeries(int maxPoints = 120)
     {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+        
         var data = new List<HeatPoint>();
-        if (!TableExists("SourceData"))
+        if (!TableExists("SourceData", connection))
         {
             return data;
         }
-
-        using var connection = _connector.GetConnection();
-        connection.Open();
 
         using var command = connection.CreateCommand();
         command.CommandText = @"
@@ -47,14 +48,14 @@ public sealed class GraphDataRepository
 
     public IReadOnlyList<DateOnly> GetAvailableHeatDemandDates()
     {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+
         var data = new List<DateOnly>();
-        if (!TableExists("SourceData"))
+        if (!TableExists("SourceData", connection))
         {
             return data;
         }
-
-        using var connection = _connector.GetConnection();
-        connection.Open();
 
         using var command = connection.CreateCommand();
         command.CommandText = @"
@@ -83,16 +84,54 @@ public sealed class GraphDataRepository
         return data;
     }
 
-    public IReadOnlyList<HeatPoint> GetElectricityPriceSeries(int maxPoints = 120)
+    public List<double> GetHeatDemandForDay(DateTime date)
     {
-        var data = new List<HeatPoint>();
-        if (!TableExists("SourceData"))
+        var heatDemands = new double[24];
+
+        using var connection = _connector.GetConnection();
+        connection.Open();
+
+        var data = new List<double>();
+        if (!TableExists("SourceData", connection))
         {
             return data;
         }
 
+        using var command = connection.CreateCommand();
+
+        command.CommandText = @"
+            SELECT TimeFrom, HeatDemand
+            FROM SourceData
+            WHERE date(TimeFrom) = date(@date)
+            ORDER BY TimeFrom
+        ";
+
+        command.Parameters.AddWithValue("@date", date.Date);
+
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            DateTime timeFrom = reader.GetDateTime(0);
+            double heatDemand = reader.GetDouble(1);
+
+            int hour = timeFrom.Hour;
+            heatDemands[hour] = heatDemand;
+        }
+
+        return new List<double>(heatDemands);
+    }
+
+    public IReadOnlyList<HeatPoint> GetElectricityPriceSeries(int maxPoints = 120)
+    {
         using var connection = _connector.GetConnection();
         connection.Open();
+        
+        var data = new List<HeatPoint>();
+        if (!TableExists("SourceData", connection))
+        {
+            return data;
+        }
 
         using var command = connection.CreateCommand();
         command.CommandText = @"
@@ -120,14 +159,14 @@ public sealed class GraphDataRepository
 
     public IReadOnlyList<HeatPoint> GetEstimatedDailyCostSeries(int maxPoints = 60)
     {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+        
         var data = new List<HeatPoint>();
-        if (!TableExists("SourceData") || !TableExists("ProductionUnits"))
+        if (!TableExists("SourceData", connection) || !TableExists("ProductionUnits", connection))
         {
             return data;
         }
-
-        using var connection = _connector.GetConnection();
-        connection.Open();
 
         using var command = connection.CreateCommand();
         command.CommandText = @"
@@ -177,14 +216,14 @@ public sealed class GraphDataRepository
 
     public IReadOnlyList<ProductionUnit> GetProductionUnits()
     {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+
         var data = new List<ProductionUnit>();
-        if (!TableExists("ProductionUnits"))
+        if (!TableExists("ProductionUnits", connection))
         {
             return data;
         }
-
-        using var connection = _connector.GetConnection();
-        connection.Open();
 
         using var command = connection.CreateCommand();
         command.CommandText = @"
@@ -201,8 +240,6 @@ public sealed class GraphDataRepository
         TryGetOrdinal(reader, "MaxHeat", out var maxHeatOrdinal);
         TryGetOrdinal(reader, "ProductionCost", out var productionCostOrdinal);
         var hasCo2 = TryGetOrdinal(reader, "Co2Rate", out var co2Ordinal)
-            || TryGetOrdinal(reader, "CO2Rate", out co2Ordinal)
-            || TryGetOrdinal(reader, "Co2Rate", out co2Ordinal)
             || TryGetOrdinal(reader, "CO2Rate", out co2Ordinal);
         TryGetOrdinal(reader, "ImagePath", out var imagePathOrdinal);
 
@@ -235,14 +272,14 @@ public sealed class GraphDataRepository
 
     private IReadOnlyList<UnitCostPoint> GetUnitMetricSeries(string metricColumn)
     {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+        
         var data = new List<UnitCostPoint>();
-        if (!TableExists("ProductionUnits"))
+        if (!TableExists("ProductionUnits", connection))
         {
             return data;
         }
-
-        using var connection = _connector.GetConnection();
-        connection.Open();
 
         using var command = connection.CreateCommand();
         command.CommandText = $@"
@@ -266,12 +303,9 @@ public sealed class GraphDataRepository
         return data;
     }
 
-    private bool TableExists(string tableName)
+    private bool TableExists(string tableName, SqliteConnection conn)
     {
-        using var connection = _connector.GetConnection();
-        connection.Open();
-
-        using var command = connection.CreateCommand();
+        using var command = conn.CreateCommand();
         command.CommandText = "SELECT COUNT(1) FROM sqlite_master WHERE type = 'table' AND name = $name;";
         command.Parameters.AddWithValue("$name", tableName);
 

@@ -10,7 +10,7 @@ namespace Heat_Production_Optimization.Models
         public HourSlot(DateOnly date, int hour)
         {
             if (hour < 0 || hour > 23)
-                throw new ArgumentOutOfRangeException(nameof(hour), "Hour must be 0–23.");
+                throw new ArgumentOutOfRangeException(nameof(hour), "Hour must be 0-23.");
 
             Date = date;
             Hour = hour;

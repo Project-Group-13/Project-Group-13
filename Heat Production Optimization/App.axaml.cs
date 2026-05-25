@@ -11,11 +11,17 @@ using Heat_Production_Optimization.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Heat_Production_Optimization.Services;
+using Heat_Production_Optimization.Data;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+
 
 namespace Heat_Production_Optimization;
 
 public partial class App : Application
 {
+    private DatabaseConnector _dbConn;
+
     public override void Initialize()
     {
         RequestedThemeVariant = ThemeVariant.Default;
@@ -29,9 +35,12 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        _dbConn = new();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             Data.DatabaseInitializer.EnsureCreated();
+
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
@@ -40,8 +49,14 @@ public partial class App : Application
             
             var services = new ServiceCollection();
             services.AddSingleton<IFilesService>(x => new FilesService(desktop.MainWindow));
+            services.AddSingleton<APIService>(x => new APIService(_dbConn));
 
             Services = services.BuildServiceProvider();
+
+            var apiService = Current?.Services?.GetService<APIService>();
+
+            // Deliberatly calling this method and not waiting
+            if(apiService != null) _ = apiService.LoadData();
         }
 
         base.OnFrameworkInitializationCompleted();

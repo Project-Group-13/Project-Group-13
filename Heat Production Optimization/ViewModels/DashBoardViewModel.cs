@@ -12,6 +12,7 @@ using Heat_Production_Optimization.Models;
 using Heat_Production_Optimization.Optimization;
 using Heat_Production_Optimization.Services;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 
 namespace Heat_Production_Optimization.ViewModels;
 
@@ -21,7 +22,6 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
     private const int FallbackDay = 1;
 
     private readonly GraphDataRepository _graphDataRepository = new();
-    private readonly OptimizerHeatDemand _heatDemandRepo = new();
     private readonly Optimizer _optimizer = new();
 
     private List<DateOnly> _availableDates = new();
@@ -102,7 +102,20 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
     }
 
     [RelayCommand]
-    private async Task UploadFile(CancellationToken token)
+    private async Task UploadSourceDataFile(CancellationToken token)
+    {
+        await UploadFile(CSVParser.Parse<SourceData, SourceDataMap>, ReplaceSourceData.ReplaceAll, token);
+
+        var apiService = App.Current?.Services?.GetService<APIService>();
+
+        if(apiService != null) _ = apiService.LoadData();
+    }
+
+    [RelayCommand]
+    private async Task UploadUnitsFile(CancellationToken token)
+      => await UploadFile(CSVParser.Parse<ProductionUnit, ProductionUnitMap>, ReplaceProductionUnitsData.ReplaceAll, token);
+
+    private async Task UploadFile<T>(Func<Stream, T> parser, Action<T> replacer, CancellationToken token)
     {
         try
         {
@@ -116,37 +129,8 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
             if ((await file.GetBasicPropertiesAsync()).Size <= 1024 * 1024 * 1000)
             {
                 await using var readStream = await file.OpenReadAsync();
-                var data = CSVParser.Parse(readStream);
-                ReplaceCSVData.ReplaceAll(data);
-                WeakReferenceMessenger.Default.Send(new CSVUploadedMessage());
-            }
-            else
-            {
-                throw new Exception("File exceeded 1GB limit.");
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
-    }
-
-    [RelayCommand]
-    private async Task UploadUnitsFile(CancellationToken token)
-    {
-        try
-        {
-            var filesService = App.Current?.Services?.GetService<IFilesService>();
-            if (filesService is null) throw new NullReferenceException("Missing File Service instance.");
-
-            var file = await filesService.UploadFileAsync();
-            if (file is null) return;
-
-            if ((await file.GetBasicPropertiesAsync()).Size <= 1024 * 1024 * 1000)
-            {
-                await using var readStream = await file.OpenReadAsync();
-                var data = ProductionUnitParser.Parse(readStream);
-                ReplaceProductionUnitsData.ReplaceAll(data);
+                var data = parser(readStream);
+                replacer(data);
                 WeakReferenceMessenger.Default.Send(new CSVUploadedMessage());
             }
             else
@@ -171,7 +155,7 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
         List<double> heatDemands;
         try
         {
-            heatDemands = _heatDemandRepo.GetHeatDemandForDay(date);
+            heatDemands = _graphDataRepository.GetHeatDemandForDay(date);
         }
         catch
         {

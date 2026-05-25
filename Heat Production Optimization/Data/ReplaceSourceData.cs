@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
-using Heat_Production_Optimization.Model;
+using Heat_Production_Optimization.Models;
 
 namespace Heat_Production_Optimization.Data;
 
-public static class ReplaceCSVData
+public static class ReplaceSourceData
 {
     public static void ReplaceAll(List<SourceData> data)
     {
@@ -53,7 +54,7 @@ public static class ReplaceCSVData
             timeFrom.Value = row.TimeFrom;
             timeTo.Value = row.TimeTo;
             heatDemand.Value = row.HeatDemand;
-            electricityPrice.Value = row.ElectricityPrice;
+            electricityPrice.Value = DBNull.Value;
             insertCommand.ExecuteNonQuery();
         }
 
