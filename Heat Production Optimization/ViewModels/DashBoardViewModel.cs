@@ -192,7 +192,9 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
             HeatDemand, 
             units, 
             hourSlot, 
-            electricityPrice
+            electricityPrice,
+            MaintenanceSchedule.GetSchedule()
+
         );
 
         var summaries = new ObservableCollection<DashboardUnitResult>();
