@@ -17,12 +17,14 @@ namespace Heat_Production_Optimization.ViewModels;
 
 public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMessage>
 {
+    private const string HeatProductionGraphLabel = "Heat Production Over Time";
+    private const string DailyCostGraphLabel = "Daily Production Costs";
     private const string ScheduleGraphLabel = "Heat Demand Schedule (By Date)";
     private const int FallbackMonth = 1;
     private const int FallbackDay = 1;
 
     [ObservableProperty]
-    private string selectedGraph = "Heat Production Over Time";
+    private string selectedGraph = HeatProductionGraphLabel;
 
     private readonly GraphDataRepository _graphDataRepository = new();
     private readonly GraphDataRepository _heatDemandRepo = new();
@@ -31,6 +33,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
 
     private List<DateOnly> _availableDates = new();
     private bool _suppressDateUpdates;
+    private bool _suppressRangeUpdates;
 
     [ObservableProperty]
     private List<int> availableYears = new();
@@ -42,6 +45,9 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
     private List<int> availableDays = new();
 
     [ObservableProperty]
+    private List<DateOnly> availableDateRange = new();
+
+    [ObservableProperty]
     private int selectedYear = DateTime.Today.Year;
 
     [ObservableProperty]
@@ -51,7 +57,19 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
     private int selectedDay = DateTime.Today.Day;
 
     [ObservableProperty]
+    private DateOnly selectedRangeStart = DateOnly.FromDateTime(DateTime.Today);
+
+    [ObservableProperty]
+    private DateOnly selectedRangeEnd = DateOnly.FromDateTime(DateTime.Today);
+
+    [ObservableProperty]
+    private string selectedTimeGrouping = "Days";
+
+    [ObservableProperty]
     private bool isScheduleGraphSelected;
+
+    [ObservableProperty]
+    private bool isRangeGraphSelected;
 
     public ObservableCollection<ISeries> Series { get; set; } = new();
 
@@ -67,6 +85,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
     {
         RefreshAvailableDates();
         IsScheduleGraphSelected = SelectedGraph == ScheduleGraphLabel;
+        IsRangeGraphSelected = SelectedGraph == HeatProductionGraphLabel || SelectedGraph == DailyCostGraphLabel;
         UpdateSeries();
 
         WeakReferenceMessenger.Default.Register(this);
@@ -75,7 +94,8 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
     partial void OnSelectedGraphChanged(string value)
     {
         IsScheduleGraphSelected = value == ScheduleGraphLabel;
-        if (IsScheduleGraphSelected)
+        IsRangeGraphSelected = value == HeatProductionGraphLabel || value == DailyCostGraphLabel;
+        if (IsScheduleGraphSelected || IsRangeGraphSelected)
         {
             RefreshAvailableDates();
         }
@@ -129,12 +149,66 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
         }
     }
 
+    partial void OnSelectedRangeStartChanged(DateOnly value)
+    {
+        if (_suppressRangeUpdates)
+        {
+            return;
+        }
+
+        if (value > SelectedRangeEnd)
+        {
+            _suppressRangeUpdates = true;
+            SelectedRangeEnd = value;
+            _suppressRangeUpdates = false;
+        }
+
+        if (IsRangeGraphSelected)
+        {
+            UpdateSeries();
+        }
+    }
+
+    partial void OnSelectedRangeEndChanged(DateOnly value)
+    {
+        if (_suppressRangeUpdates)
+        {
+            return;
+        }
+
+        if (value < SelectedRangeStart)
+        {
+            _suppressRangeUpdates = true;
+            SelectedRangeStart = value;
+            _suppressRangeUpdates = false;
+        }
+
+        if (IsRangeGraphSelected)
+        {
+            UpdateSeries();
+        }
+    }
+
+    partial void OnSelectedTimeGroupingChanged(string value)
+    {
+        if (IsRangeGraphSelected)
+        {
+            UpdateSeries();
+        }
+    }
+
     public List<string> GraphOptions { get; } = new()
     {
-        "Heat Production Over Time",
-        "Daily Production Costs",
+        HeatProductionGraphLabel,
+        DailyCostGraphLabel,
         "30-Day Efficiency Trends",
         ScheduleGraphLabel
+    };
+
+    public List<string> TimeGroupingOptions { get; } = new()
+    {
+        "Days",
+        "Hours"
     };
 
     private void UpdateSeries()
@@ -143,11 +217,11 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
         XAxes.Clear();
         YAxes.Clear();
 
-        if (SelectedGraph == "Heat Production Over Time")
+        if (SelectedGraph == HeatProductionGraphLabel)
         {
             BuildHeatDemandChart();
         }
-        else if (SelectedGraph == "Daily Production Costs")
+        else if (SelectedGraph == DailyCostGraphLabel)
         {
             BuildDailyCostChart();
         }
@@ -163,23 +237,35 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
 
     private void BuildHeatDemandChart()
     {
-        var sourceData = _graphDataRepository.GetHeatDemandSeries();
+        if (!TryGetSelectedRange(out var startDate, out var endDate))
+        {
+            SetNoDataState("Invalid Date Range");
+            return;
+        }
+
+        var isHourly = SelectedTimeGrouping == "Hours";
+        var sourceData = isHourly
+            ? _graphDataRepository.GetHeatDemandSeriesByHour(startDate, endDate)
+            : _graphDataRepository.GetHeatDemandSeriesByDay(startDate, endDate);
         if (sourceData.Count > 0)
         {
-            var labels = sourceData.Select(p => p.Timestamp.ToString("MM-dd HH:mm")).ToArray();
+            var labelFormat = isHourly ? "yyyy-MM-dd HH:00" : "yyyy-MM-dd";
+            var labels = sourceData.Select(p => p.Timestamp.ToString(labelFormat)).ToArray();
             var values = sourceData.Select(p => p.Value).ToArray();
+
+            var seriesName = isHourly ? "Heat Production (Hourly)" : "Heat Production (Daily)";
 
             Series.Add(new ColumnSeries<double>
             {
                 Values = values,
-                Name = "Heat Production",
+                Name = seriesName,
                 Fill = new SolidColorPaint(SKColors.LightBlue),
             });
 
             XAxes.Add(new Axis
             {
                 Labels = labels,
-                Name = "Time",
+                Name = isHourly ? "Hour" : "Day",
                 LabelsPaint = Black(),
                 NamePaint = Black()
             });
@@ -192,7 +278,10 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
                 NamePaint = Black()
             });
 
-            ChartTitle = "Heat Production Over Time";
+            var rangeLabel = $"{startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}";
+            ChartTitle = isHourly
+                ? $"Heat Production Over Time (Hourly, {rangeLabel})"
+                : $"Heat Production Over Time (Daily, {rangeLabel})";
             return;
         }
 
@@ -235,23 +324,35 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
 
     private void BuildDailyCostChart()
     {
-        var costData = _graphDataRepository.GetEstimatedDailyCostSeries();
+        if (!TryGetSelectedRange(out var startDate, out var endDate))
+        {
+            SetNoDataState("Invalid Date Range");
+            return;
+        }
+
+        var isHourly = SelectedTimeGrouping == "Hours";
+        var costData = isHourly
+            ? _graphDataRepository.GetEstimatedCostSeriesByHour(startDate, endDate)
+            : _graphDataRepository.GetEstimatedCostSeriesByDay(startDate, endDate);
         if (costData.Count > 0)
         {
-            var labels = costData.Select(p => p.Timestamp.ToString("MM-dd")).ToArray();
+            var labelFormat = isHourly ? "yyyy-MM-dd HH:00" : "yyyy-MM-dd";
+            var labels = costData.Select(p => p.Timestamp.ToString(labelFormat)).ToArray();
             var values = costData.Select(p => p.Value).ToArray();
+
+            var seriesName = isHourly ? "Production Cost (Hourly)" : "Production Cost (Daily)";
 
             Series.Add(new ColumnSeries<double>
             {
                 Values = values,
-                Name = "Daily Production Cost",
+                Name = seriesName,
                 Fill = new SolidColorPaint(SKColors.LightCoral),
             });
 
             XAxes.Add(new Axis
             {
                 Labels = labels,
-                Name = "Day",
+                Name = isHourly ? "Hour" : "Day",
                 LabelsPaint = Black(),
                 NamePaint = Black()
             });
@@ -264,7 +365,10 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
                 NamePaint = Black()
             });
 
-            ChartTitle = "Daily Production Costs";
+            var rangeLabel = $"{startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}";
+            ChartTitle = isHourly
+                ? $"Production Costs (Hourly, {rangeLabel})"
+                : $"Production Costs (Daily, {rangeLabel})";
             return;
         }
 
@@ -464,6 +568,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
 
     public void Receive(CSVUploadedMessage message)
     {
+        RefreshAvailableDates();
         UpdateSeries();
     }
 
@@ -474,6 +579,24 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
         {
             _availableDates.Add(DateOnly.FromDateTime(DateTime.Today));
         }
+
+        AvailableDateRange = _availableDates.ToList();
+        _suppressRangeUpdates = true;
+        if (!AvailableDateRange.Contains(SelectedRangeStart))
+        {
+            SelectedRangeStart = AvailableDateRange.First();
+        }
+
+        if (!AvailableDateRange.Contains(SelectedRangeEnd))
+        {
+            SelectedRangeEnd = AvailableDateRange.Last();
+        }
+
+        if (SelectedRangeStart > SelectedRangeEnd)
+        {
+            SelectedRangeEnd = SelectedRangeStart;
+        }
+        _suppressRangeUpdates = false;
 
         AvailableYears = _availableDates
             .Select(date => date.Year)
@@ -494,6 +617,24 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
 
         SyncMonthAndDayForYear(SelectedYear);
         _suppressDateUpdates = false;
+    }
+
+    private bool TryGetSelectedRange(out DateOnly startDate, out DateOnly endDate)
+    {
+        startDate = SelectedRangeStart;
+        endDate = SelectedRangeEnd;
+
+        if (startDate == default || endDate == default)
+        {
+            return false;
+        }
+
+        if (startDate > endDate)
+        {
+            (startDate, endDate) = (endDate, startDate);
+        }
+
+        return true;
     }
 
     private void SyncMonthAndDayForYear(int year)
