@@ -10,7 +10,6 @@
         x:Class="Heat_Production_Optimization.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Heat Optimization Scheduler"
-        Background="#F4F4F7"
         x:CompileBindings="False">
     <Design.DataContext>
         <viewModels:MainWindowViewModel/>
@@ -89,15 +88,18 @@
         </Grid.RowDefinitions>
 
         <!-- Top header bar -->
-        <Border Grid.Row="0" Background="#D0021B" Padding="16" >
-            <DockPanel LastChildFill="True">
-                <TextBlock Text="Heat Optimization Scheduler" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-            </DockPanel>
+        <Border Grid.Row="0" Background="{StaticResource Brush.HeaderGradient}" Padding="20,14" BoxShadow="0 4 16 0 #0F172A22">
+            <Grid ColumnDefinitions="*" VerticalAlignment="Center">
+                <StackPanel Spacing="2">
+                    <TextBlock Text="Heat Optimization Scheduler" FontSize="18" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Production planning workspace" FontSize="12" Foreground="White" Opacity="0.8" />
+                </StackPanel>
+            </Grid>
         </Border>
 
         <!-- Main content -->
         <Border Grid.Row="1" Padding="20">
-            <Border Background="White" CornerRadius="14" Padding="20">
+            <Border Classes="card" CornerRadius="16" Padding="20">
                 <TabControl>
                     <TabItem Header="Dashboard">                                                                                                                                                                                                            
                         <views:DashBoardView DataContext="{Binding DashBoardViewModel}"/>

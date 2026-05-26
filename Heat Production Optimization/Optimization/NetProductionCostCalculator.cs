@@ -10,16 +10,16 @@ namespace Heat_Production_Optimization.Optimization
 
             if (unit.UnitType == "CHP")
             {
-                var baseCost = unit.ProductionCost - (unit.EnergyRate ?? 0) * (electricityPrice * 0.9);
 
-                var operatingCost = 50;
-                var maxProfit = 500;
+                var baseCost = unit.ProductionCost - (unit.EnergyRate ?? 0) * electricityPrice;
+
+                var operatingCost = 300;
+                var maxProfit = 50;
 
                 var cost = baseCost + operatingCost;
 
-                double dynamicPenalty = 0.2 * electricityPrice;
-
-                //cost += dynamicPenalty;
+                // dynamic penalty based on electricity price
+                cost += 0.15 * electricityPrice;
 
                 return Math.Max(cost, -maxProfit);
             }

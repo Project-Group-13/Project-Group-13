@@ -46,6 +46,84 @@ public sealed class GraphDataRepository
         return data;
     }
 
+    public IReadOnlyList<HeatPoint> GetHeatDemandSeriesByDay(DateOnly startDate, DateOnly endDate)
+    {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+
+        var data = new List<HeatPoint>();
+        if (!TableExists("SourceData", connection))
+        {
+            return data;
+        }
+
+        using var command = connection.CreateCommand();
+        command.CommandText = @"
+            SELECT date(TimeFrom) AS DayBucket,
+                   SUM(HeatDemand) AS HeatDemand
+            FROM SourceData
+            WHERE TimeFrom IS NOT NULL AND HeatDemand IS NOT NULL
+              AND date(TimeFrom) >= $startDate
+              AND date(TimeFrom) <= $endDate
+            GROUP BY date(TimeFrom)
+            ORDER BY date(TimeFrom);";
+        command.Parameters.AddWithValue("$startDate", startDate.ToString("yyyy-MM-dd"));
+        command.Parameters.AddWithValue("$endDate", endDate.ToString("yyyy-MM-dd"));
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var timestamp = ParseDateTime(reader.GetValue(0));
+            var heatDemand = ParseDouble(reader.GetValue(1));
+
+            if (timestamp != DateTime.MinValue && !double.IsNaN(heatDemand))
+            {
+                data.Add(new HeatPoint(timestamp, heatDemand));
+            }
+        }
+
+        return data;
+    }
+
+    public IReadOnlyList<HeatPoint> GetHeatDemandSeriesByHour(DateOnly startDate, DateOnly endDate)
+    {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+
+        var data = new List<HeatPoint>();
+        if (!TableExists("SourceData", connection))
+        {
+            return data;
+        }
+
+        using var command = connection.CreateCommand();
+        command.CommandText = @"
+            SELECT strftime('%Y-%m-%d %H:00:00', TimeFrom) AS HourBucket,
+                   SUM(HeatDemand) AS HeatDemand
+            FROM SourceData
+            WHERE TimeFrom IS NOT NULL AND HeatDemand IS NOT NULL
+              AND date(TimeFrom) >= $startDate
+              AND date(TimeFrom) <= $endDate
+            GROUP BY strftime('%Y-%m-%d %H', TimeFrom)
+            ORDER BY strftime('%Y-%m-%d %H', TimeFrom);";
+        command.Parameters.AddWithValue("$startDate", startDate.ToString("yyyy-MM-dd"));
+        command.Parameters.AddWithValue("$endDate", endDate.ToString("yyyy-MM-dd"));
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var timestamp = ParseDateTime(reader.GetValue(0));
+            var heatDemand = ParseDouble(reader.GetValue(1));
+
+            if (timestamp != DateTime.MinValue && !double.IsNaN(heatDemand))
+            {
+                data.Add(new HeatPoint(timestamp, heatDemand));
+            }
+        }
+
+        return data;
+    }
+
     public IReadOnlyList<DateOnly> GetAvailableHeatDemandDates()
     {
         using var connection = _connector.GetConnection();
@@ -206,6 +284,94 @@ public sealed class GraphDataRepository
             ORDER BY date(sd.TimeFrom)
             LIMIT $limit;";
         command.Parameters.AddWithValue("$limit", maxPoints);
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var timestamp = ParseDateTime(reader.GetValue(0));
+            var estimatedCost = ParseDouble(reader.GetValue(1));
+
+            if (timestamp != DateTime.MinValue && !double.IsNaN(estimatedCost))
+            {
+                data.Add(new HeatPoint(timestamp, estimatedCost));
+            }
+        }
+
+        return data;
+    }
+
+    public IReadOnlyList<HeatPoint> GetEstimatedCostSeriesByDay(DateOnly startDate, DateOnly endDate)
+    {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+
+        var data = new List<HeatPoint>();
+        if (!TableExists("SourceData", connection) || !TableExists("ProductionUnits", connection))
+        {
+            return data;
+        }
+
+        using var command = connection.CreateCommand();
+        command.CommandText = @"
+            SELECT date(sd.TimeFrom) AS DayBucket,
+                   SUM(sd.HeatDemand * avgCost.AvgProductionCost) AS EstimatedDailyCost
+            FROM SourceData sd
+            CROSS JOIN (
+                SELECT AVG(ProductionCost) AS AvgProductionCost
+                FROM ProductionUnits
+                WHERE ProductionCost IS NOT NULL
+            ) avgCost
+            WHERE sd.TimeFrom IS NOT NULL AND sd.HeatDemand IS NOT NULL
+              AND date(sd.TimeFrom) >= $startDate
+              AND date(sd.TimeFrom) <= $endDate
+            GROUP BY date(sd.TimeFrom)
+            ORDER BY date(sd.TimeFrom);";
+        command.Parameters.AddWithValue("$startDate", startDate.ToString("yyyy-MM-dd"));
+        command.Parameters.AddWithValue("$endDate", endDate.ToString("yyyy-MM-dd"));
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var timestamp = ParseDateTime(reader.GetValue(0));
+            var estimatedCost = ParseDouble(reader.GetValue(1));
+
+            if (timestamp != DateTime.MinValue && !double.IsNaN(estimatedCost))
+            {
+                data.Add(new HeatPoint(timestamp, estimatedCost));
+            }
+        }
+
+        return data;
+    }
+
+    public IReadOnlyList<HeatPoint> GetEstimatedCostSeriesByHour(DateOnly startDate, DateOnly endDate)
+    {
+        using var connection = _connector.GetConnection();
+        connection.Open();
+
+        var data = new List<HeatPoint>();
+        if (!TableExists("SourceData", connection) || !TableExists("ProductionUnits", connection))
+        {
+            return data;
+        }
+
+        using var command = connection.CreateCommand();
+        command.CommandText = @"
+            SELECT strftime('%Y-%m-%d %H:00:00', sd.TimeFrom) AS HourBucket,
+                   SUM(sd.HeatDemand * avgCost.AvgProductionCost) AS EstimatedHourlyCost
+            FROM SourceData sd
+            CROSS JOIN (
+                SELECT AVG(ProductionCost) AS AvgProductionCost
+                FROM ProductionUnits
+                WHERE ProductionCost IS NOT NULL
+            ) avgCost
+            WHERE sd.TimeFrom IS NOT NULL AND sd.HeatDemand IS NOT NULL
+              AND date(sd.TimeFrom) >= $startDate
+              AND date(sd.TimeFrom) <= $endDate
+            GROUP BY strftime('%Y-%m-%d %H', sd.TimeFrom)
+            ORDER BY strftime('%Y-%m-%d %H', sd.TimeFrom);";
+        command.Parameters.AddWithValue("$startDate", startDate.ToString("yyyy-MM-dd"));
+        command.Parameters.AddWithValue("$endDate", endDate.ToString("yyyy-MM-dd"));
 
         using var reader = command.ExecuteReader();
         while (reader.Read())
