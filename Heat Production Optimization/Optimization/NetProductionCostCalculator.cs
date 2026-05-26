@@ -7,14 +7,19 @@ namespace Heat_Production_Optimization.Optimization
     {
         public static double ComputeNetProductionCost(ProductionUnit unit, HourSlot hour, double electricityPrice)
         {
-            var operatingCost = 250;    // additional running cost
-            var maxProfit = 200;        // cap on profit
 
             if (unit.UnitType == "CHP")
             {
-                var cost = unit.ProductionCost - (unit.EnergyRate ?? 0) * electricityPrice;
 
-                cost += operatingCost;
+                var baseCost = unit.ProductionCost - (unit.EnergyRate ?? 0) * electricityPrice;
+
+                var operatingCost = 300;
+                var maxProfit = 50;
+
+                var cost = baseCost + operatingCost;
+
+                // dynamic penalty based on electricity price
+                cost += 0.15 * electricityPrice;
 
                 return Math.Max(cost, -maxProfit);
             }
