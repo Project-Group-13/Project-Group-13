@@ -3,6 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Interactivity;
+
 namespace Heat_Production_Optimization.Views;
 
 public partial class UnitsView : UserControl
@@ -34,24 +35,18 @@ public partial class UnitsView : UserControl
     private void UnitCardToggle_CheckedChanged(object? sender, RoutedEventArgs e)
     {
         if (sender is ToggleButton toggle)
-        {
             ApplyUnitToggleAppearance(toggle);
-        }
     }
 
     private void UnitCardToggle_PointerEntered(object? sender, PointerEventArgs e)
     {
         if (sender is ToggleButton toggle)
-        {
             ApplyUnitToggleAppearance(toggle);
-        }
     }
 
     private void UnitCardToggle_PointerExited(object? sender, PointerEventArgs e)
     {
         if (sender is ToggleButton toggle)
-        {
             ApplyUnitToggleAppearance(toggle);
-        }
     }
 }

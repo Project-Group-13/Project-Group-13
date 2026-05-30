@@ -3,7 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Interactivity;
-using Heat_Production_Optimization.Models;
+using Heat_Production_Optimization.ViewModels;
 
 namespace Heat_Production_Optimization.Views;
 
@@ -14,9 +14,9 @@ public partial class UnitDetails : Window
         InitializeComponent();
     }
 
-    public UnitDetails(ProductionUnit unit) : this()
+    public UnitDetails(ProductionUnitViewModel vm) : this()
     {
-        DataContext = unit;
+        DataContext = vm;
     }
 
     private static void ApplyDetailToggleAppearance(ToggleButton toggle)
@@ -41,25 +41,19 @@ public partial class UnitDetails : Window
     private void DetailToggle_CheckedChanged(object? sender, RoutedEventArgs e)
     {
         if (sender is ToggleButton toggle)
-        {
             ApplyDetailToggleAppearance(toggle);
-        }
     }
 
     private void DetailToggle_PointerEntered(object? sender, PointerEventArgs e)
     {
         if (sender is ToggleButton toggle)
-        {
             ApplyDetailToggleAppearance(toggle);
-        }
     }
 
     private void DetailToggle_PointerExited(object? sender, PointerEventArgs e)
     {
         if (sender is ToggleButton toggle)
-        {
             ApplyDetailToggleAppearance(toggle);
-        }
     }
 
     private void OnCloseClick(object? sender, RoutedEventArgs e)

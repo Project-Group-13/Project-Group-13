@@ -24,4 +24,6 @@ namespace Heat_Production_Optimization.Optimization
             return candidates;
         }
     }
+
+    public record DispatchCandidate(ProductionUnit Unit, double NetProductionCost);
 }

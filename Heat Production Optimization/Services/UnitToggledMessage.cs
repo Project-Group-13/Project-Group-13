@@ -1,3 +1,3 @@
 namespace Heat_Production_Optimization.Services;
 
-public sealed record CSVUploadedMessage;
+public sealed record UnitToggledMessage;

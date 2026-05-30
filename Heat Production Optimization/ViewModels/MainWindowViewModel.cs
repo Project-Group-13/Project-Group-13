@@ -8,7 +8,13 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     public string Greeting { get; } = "Welcome to Avalonia!";
 
-    public GraphsViewModel GraphsViewModel { get; } = new();
     public UnitsViewModel UnitsViewModel { get; } = new();
-    public DashBoardViewModel DashBoardViewModel { get; } = new();
+    public GraphsViewModel GraphsViewModel { get; }
+    public DashBoardViewModel DashBoardViewModel { get; }
+
+    public MainWindowViewModel()
+    {
+        GraphsViewModel = new GraphsViewModel(UnitsViewModel);
+        DashBoardViewModel = new DashBoardViewModel(UnitsViewModel);
+    }
 }

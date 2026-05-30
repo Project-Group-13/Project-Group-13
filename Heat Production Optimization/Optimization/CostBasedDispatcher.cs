@@ -16,6 +16,7 @@ namespace Heat_Production_Optimization.Optimization
 
             return candidates
                 .OrderBy(c => c.NetProductionCost)
+                .ThenBy(c => c.Unit.Name) // this makes the ordering deterministic for units that have the same netproductioncost
                 .Select(c => c.Unit)
                 .ToList();
         }

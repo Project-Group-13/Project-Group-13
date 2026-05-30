@@ -66,10 +66,11 @@
 
                                         <ToggleButton Classes="unit-card-toggle"
                                                       IsChecked="{Binding Enabled, Mode=TwoWay}"
+                                                      Command="{Binding DataContext.UnitsViewModel.ToggleEnableCommand, RelativeSource={RelativeSource AncestorType=TabControl}}"
+                                                      CommandParameter="{Binding}"
                                                       Content="Enable / Disable"
                                                       HorizontalAlignment="Stretch"
                                                       HorizontalContentAlignment="Center"
-                                                      VerticalAlignment="Center"
                                                       Padding="12,10"
                                                       FontWeight="SemiBold"
                                                       PointerEntered="UnitCardToggle_PointerEntered"

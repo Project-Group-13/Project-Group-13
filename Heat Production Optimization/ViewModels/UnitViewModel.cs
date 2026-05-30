@@ -1,15 +1,11 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Windows.Input;
 using Heat_Production_Optimization.Data;
-using Heat_Production_Optimization.Models;
 using Heat_Production_Optimization.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Heat_Production_Optimization.ViewModels;
 
@@ -18,12 +14,11 @@ public partial class UnitsViewModel : ViewModelBase, IRecipient<CSVUploadedMessa
     private readonly GraphDataRepository _graphDataRepository = new();
 
     [ObservableProperty]
-    private ObservableCollection<ProductionUnit> _allUnits;
+    private ObservableCollection<ProductionUnitViewModel> _allUnits = new();
 
     [ObservableProperty]
-    private ProductionUnit? _selectedUnit;
+    private ProductionUnitViewModel? _selectedUnit;
 
-    public ICommand? SelectUnitCommand { get; private set; }
     public ICommand? ToggleEnableCommand { get; private set; }
     public ICommand? OpenUnitDetailsCommand { get; private set; }
 
@@ -31,38 +26,28 @@ public partial class UnitsViewModel : ViewModelBase, IRecipient<CSVUploadedMessa
     {
         UpdateUnits();
         WeakReferenceMessenger.Default.Register(this);
+
+        ToggleEnableCommand = new RelayCommand<ProductionUnitViewModel?>(vm =>
+        {
+            if (vm == null) return;
+            vm.Enabled = !vm.Enabled;
+            WeakReferenceMessenger.Default.Send(new UnitToggledMessage());
+        });
+
+        OpenUnitDetailsCommand = new RelayCommand<ProductionUnitViewModel?>(vm =>
+        {
+            if (vm == null) return;
+            var window = new Views.UnitDetails(vm);
+            window.Show();
+        });
     }
 
     public void UpdateUnits()
     {
-        AllUnits = new ObservableCollection<ProductionUnit>(_graphDataRepository.GetProductionUnits());
+        AllUnits = new ObservableCollection<ProductionUnitViewModel>(
+            _graphDataRepository.GetProductionUnits().Select(u => new ProductionUnitViewModel(u)));
+
         SelectedUnit = AllUnits.Count > 0 ? AllUnits[0] : null;
-
-        // Ensure all units start disabled per request
-        foreach (var u in AllUnits)
-        {
-            u.Enabled = false;
-        }
-
-        SelectUnitCommand = new RelayCommand<ProductionUnit?>(u =>
-        {
-            if (u != null)
-                SelectedUnit = u;
-        });
-
-        ToggleEnableCommand = new RelayCommand<ProductionUnit?>(u =>
-        {
-            if (u != null)
-                u.Enabled = !u.Enabled;
-        });
-
-        OpenUnitDetailsCommand = new RelayCommand<ProductionUnit?>(u =>
-        {
-            if (u == null) return;
-            // Open a details window for the selected unit
-            var wnd = new Views.UnitDetails(u);
-            wnd.Show();
-        });
     }
 
     public void Receive(CSVUploadedMessage message)
