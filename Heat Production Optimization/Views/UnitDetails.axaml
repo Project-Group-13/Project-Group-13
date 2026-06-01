@@ -34,6 +34,14 @@
         </ControlTemplate>
       </Setter>
     </Style>
+    <Style Selector="ToggleButton.detail-toggle:unchecked:pointerover">
+      <Setter Property="Background" Value="#475569" />
+      <Setter Property="BorderBrush" Value="#334155" />
+    </Style>
+    <Style Selector="ToggleButton.detail-toggle:unchecked:pressed">
+      <Setter Property="Background" Value="#334155" />
+      <Setter Property="BorderBrush" Value="#1F2937" />
+    </Style>
     <Style Selector="ToggleButton.detail-toggle:checked">
       <Setter Property="Background" Value="#16A34A" />
       <Setter Property="BorderBrush" Value="#15803D" />
@@ -143,10 +151,7 @@
                                   FontWeight="SemiBold"
                                   HorizontalContentAlignment="Center"
                                   Padding="14,10"
-                                  PointerEntered="DetailToggle_PointerEntered"
-                                  PointerExited="DetailToggle_PointerExited"
-                                  Checked="DetailToggle_CheckedChanged"
-                                  Unchecked="DetailToggle_CheckedChanged" />
+                                  />
                     <Button Grid.Column="2" Classes="detail-close" Click="OnCloseClick" Width="100" Padding="14,10">Close</Button>
                   </Grid>
                 </StackPanel>

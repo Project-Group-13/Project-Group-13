@@ -73,10 +73,7 @@
                                                       HorizontalContentAlignment="Center"
                                                       Padding="12,10"
                                                       FontWeight="SemiBold"
-                                                      PointerEntered="UnitCardToggle_PointerEntered"
-                                                      PointerExited="UnitCardToggle_PointerExited"
-                                                      Checked="UnitCardToggle_CheckedChanged"
-                                                      Unchecked="UnitCardToggle_CheckedChanged" />
+                                                      />
                                     </StackPanel>
                                 </Border>
                             </Grid>

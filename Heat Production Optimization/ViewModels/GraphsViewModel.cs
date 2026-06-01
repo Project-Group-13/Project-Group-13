@@ -29,7 +29,6 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
     private readonly UnitsViewModel _unitsViewModel;
     private readonly GraphDataRepository _graphDataRepository = new();
     private readonly Optimizer _optimizer = new();
-    private readonly List<MaintenancePeriod> _maintenancePeriod = new();
 
     private List<DateOnly> _availableDates = new();
     private bool _suppressDateUpdates;
@@ -500,7 +499,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
                 units,
                 new HourSlot(dateOnly, hour),
                 electricityPrice,
-                _maintenancePeriod
+                MaintenanceSchedule.GetSchedule()
             );
 
             foreach (var result in results)

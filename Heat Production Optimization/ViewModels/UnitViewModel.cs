@@ -30,7 +30,6 @@ public partial class UnitsViewModel : ViewModelBase, IRecipient<CSVUploadedMessa
         ToggleEnableCommand = new RelayCommand<ProductionUnitViewModel?>(vm =>
         {
             if (vm == null) return;
-            vm.Enabled = !vm.Enabled;
             WeakReferenceMessenger.Default.Send(new UnitToggledMessage());
         });
 
