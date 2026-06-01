@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml.Styling;
@@ -12,9 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using Heat_Production_Optimization.Services;
 using Heat_Production_Optimization.Data;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-
 
 namespace Heat_Production_Optimization;
 
