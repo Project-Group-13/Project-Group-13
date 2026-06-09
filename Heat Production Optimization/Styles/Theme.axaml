@@ -106,11 +106,15 @@
     <Setter Property="CornerRadius" Value="10" />
   </Style>
 
-  <Style Selector="Button:pointerover">
-    <Setter Property="Background" Value="{StaticResource Brush.SurfaceMuted}" />
+  <!-- /template/ ContentPresenter targets the button's inner template element directly,
+       overriding Avalonia's FluentTheme hover rules which apply at the same level and
+       would otherwise beat a plain Button:pointerover Background setter -->
+  <Style Selector="Button:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource Brush.Border}" />
+    <Setter Property="TextElement.Foreground" Value="{StaticResource Brush.TextPrimary}" />
   </Style>
 
-  <Style Selector="Button:pressed">
+  <Style Selector="Button:pressed /template/ ContentPresenter">
     <Setter Property="Background" Value="#E6E7EB" />
   </Style>
 
@@ -120,12 +124,15 @@
     <Setter Property="Foreground" Value="White" />
   </Style>
 
-  <Style Selector="Button.primary:pointerover">
+  <!-- /template/ ContentPresenter — same reason as above, needed to beat FluentTheme -->
+  <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
     <Setter Property="Background" Value="{StaticResource Brush.AccentDark}" />
+    <Setter Property="TextElement.Foreground" Value="White" />
   </Style>
 
-  <Style Selector="Button.primary:pressed">
+  <Style Selector="Button.primary:pressed /template/ ContentPresenter">
     <Setter Property="Background" Value="#9A0014" />
+    <Setter Property="TextElement.Foreground" Value="White" />
   </Style>
 
   <Style Selector="ComboBox">

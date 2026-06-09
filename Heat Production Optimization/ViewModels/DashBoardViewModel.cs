@@ -16,11 +16,12 @@ using System.IO;
 
 namespace Heat_Production_Optimization.ViewModels;
 
-public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedMessage>
+public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedMessage>, IRecipient<UnitToggledMessage>
 {
     private const int FallbackMonth = 1;
     private const int FallbackDay = 1;
 
+    private readonly UnitsViewModel _unitsViewModel;
     private readonly GraphDataRepository _graphDataRepository = new();
     private readonly Optimizer _optimizer = new();
 
@@ -51,13 +52,14 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
     public List<int> Hours { get; } = Enumerable.Range(0, 24).ToList();
     public IRelayCommand RefreshDashboardCommand { get; }
 
-    public DashBoardViewModel()
+    public DashBoardViewModel(UnitsViewModel unitsViewModel)
     {
+        _unitsViewModel = unitsViewModel;
         RefreshDashboardCommand = new RelayCommand(RefreshDashboard);
         RefreshAvailableDates();
         RefreshDashboard();
 
-        WeakReferenceMessenger.Default.Register(this);
+        WeakReferenceMessenger.Default.RegisterAll(this);
     }
 
     partial void OnSelectedYearChanged(int value)
@@ -181,10 +183,20 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
             return;
         }
 
-        var units = _graphDataRepository.GetProductionUnits().ToList();
-        if (units.Count == 0)
+        if (_unitsViewModel.AllUnits.Count == 0)
         {
             SetNoData("No production units available.");
+            return;
+        }
+
+        var units = _unitsViewModel.AllUnits
+            .Where(vm => vm.Enabled)
+            .Select(vm => vm.ProductionUnit)
+            .ToList();
+
+        if (units.Count == 0)
+        {
+            SetNoData("All units are disabled. Enable at least one unit in the Units tab.");
             return;
         }
 
@@ -363,6 +375,11 @@ public partial class DashBoardViewModel : ViewModelBase, IRecipient<CSVUploadedM
     public void Receive(CSVUploadedMessage message)
     {
         RefreshAvailableDates();
+        RefreshDashboard();
+    }
+
+    public void Receive(UnitToggledMessage message)
+    {
         RefreshDashboard();
     }
 }

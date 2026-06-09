@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Xml.Schema;
-using Microsoft.Data.Sqlite;
 using System.Text.Json;
 using Heat_Production_Optimization.Data;
-using System.Security;
 using System.Threading.Tasks;
 
 namespace Heat_Production_Optimization.Services;

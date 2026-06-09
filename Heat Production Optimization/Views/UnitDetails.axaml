@@ -151,10 +151,7 @@
                                   FontWeight="SemiBold"
                                   HorizontalContentAlignment="Center"
                                   Padding="14,10"
-                                  PointerEntered="DetailToggle_PointerEntered"
-                                  PointerExited="DetailToggle_PointerExited"
-                                  Checked="DetailToggle_CheckedChanged"
-                                  Unchecked="DetailToggle_CheckedChanged" />
+                                  />
                     <Button Grid.Column="2" Classes="detail-close" Click="OnCloseClick" Width="100" Padding="14,10">Close</Button>
                   </Grid>
                 </StackPanel>

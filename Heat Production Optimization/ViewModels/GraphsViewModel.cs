@@ -15,7 +15,7 @@ using System.Linq;
 
 namespace Heat_Production_Optimization.ViewModels;
 
-public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMessage>
+public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMessage>, IRecipient<UnitToggledMessage>
 {
     private const string HeatProductionGraphLabel = "Heat Production Over Time";
     private const string DailyCostGraphLabel = "Daily Production Costs";
@@ -26,10 +26,9 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
     [ObservableProperty]
     private string selectedGraph = HeatProductionGraphLabel;
 
+    private readonly UnitsViewModel _unitsViewModel;
     private readonly GraphDataRepository _graphDataRepository = new();
-    private readonly GraphDataRepository _heatDemandRepo = new();
     private readonly Optimizer _optimizer = new();
-    private readonly List<MaintenancePeriod> _maintenancePeriod = new();
 
     private List<DateOnly> _availableDates = new();
     private bool _suppressDateUpdates;
@@ -81,14 +80,15 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
 
     private static SolidColorPaint Black() => new SolidColorPaint(SKColors.Black);
 
-    public GraphsViewModel()
+    public GraphsViewModel(UnitsViewModel unitsViewModel)
     {
+        _unitsViewModel = unitsViewModel;
         RefreshAvailableDates();
         IsScheduleGraphSelected = SelectedGraph == ScheduleGraphLabel;
         IsRangeGraphSelected = SelectedGraph == HeatProductionGraphLabel || SelectedGraph == DailyCostGraphLabel;
         UpdateSeries();
 
-        WeakReferenceMessenger.Default.Register(this);
+        WeakReferenceMessenger.Default.RegisterAll(this);
     }
 
     partial void OnSelectedGraphChanged(string value)
@@ -460,7 +460,7 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
             return;
         }
 
-        var heatDemands = _heatDemandRepo.GetHeatDemandForDay(date);
+        var heatDemands = _graphDataRepository.GetHeatDemandForDay(date);
 
         if (heatDemands.Count == 0 || heatDemands.All(value => value <= 0))
         {
@@ -468,7 +468,11 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
             return;
         }
 
-        var units = _graphDataRepository.GetProductionUnits();
+        var units = _unitsViewModel.AllUnits
+            .Where(vm => vm.Enabled)
+            .Select(vm => vm.ProductionUnit)
+            .ToList();
+
         if (units.Count == 0)
         {
             SetNoDataState("No Production Units Found");
@@ -492,10 +496,10 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
 
             var results = _optimizer.Optimize(
                 demand,
-                units.ToList(),
+                units,
                 new HourSlot(dateOnly, hour),
                 electricityPrice,
-                _maintenancePeriod
+                MaintenanceSchedule.GetSchedule()
             );
 
             foreach (var result in results)
@@ -679,5 +683,10 @@ public partial class GraphsViewModel : ViewModelBase, IRecipient<CSVUploadedMess
         {
             SelectedDay = AvailableDays.Last();
         }
+    }
+
+    public void Receive(UnitToggledMessage message)
+    {
+        UpdateSeries();
     }
 }

@@ -38,10 +38,10 @@ namespace Heat_Production_Optimization.Optimization
                 remainingDemand -= heatProduced;
 
                 results.Add(new OptimizerResult
-                {
-                    UnitName = unit.Name,
-                    HeatProduced = heatProduced
-                });
+                (
+                    unit.Name,
+                    heatProduced
+                ));
             }
 
             return results;

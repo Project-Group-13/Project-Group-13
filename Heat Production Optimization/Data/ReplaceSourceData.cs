@@ -1,63 +1,35 @@
 using System;
 using System.Collections.Generic;
 using Heat_Production_Optimization.Models;
+using Microsoft.Data.Sqlite;
 
 namespace Heat_Production_Optimization.Data;
 
 public static class ReplaceSourceData
 {
-    public static void ReplaceAll(List<SourceData> data)
+    private const string InsertSql = @"
+        INSERT INTO SourceData (PeriodType, TimeFrom, TimeTo, HeatDemand, ElectricityPrice)
+        VALUES ($periodType, $timeFrom, $timeTo, $heatDemand, $electricityPrice);";
+
+    public static void ReplaceAll(List<SourceData> data) =>
+        ReplaceData.Execute("SourceData", InsertSql, PrepareParameters, BindValues, data);
+
+    private static void PrepareParameters(SqliteCommand cmd)
     {
-        using var conn = new DatabaseConnector().GetConnection();
-        conn.Open();
-
-        // BeginTransaction() allows grouping of multiple SQL statements into a single unit of work
-        // This is needed to avoid database data being wiped due to issues with the InsertInto query
-        using var transaction = conn.BeginTransaction();
-
-        using (var deleteCommand = conn.CreateCommand())
+        foreach (var name in new[] { "$periodType", "$timeFrom", "$timeTo", "$heatDemand", "$electricityPrice" })
         {
-            deleteCommand.Transaction = transaction;
-            deleteCommand.CommandText = "DELETE FROM SourceData;";
-            deleteCommand.ExecuteNonQuery();
+            var p = cmd.CreateParameter();
+            p.ParameterName = name;
+            cmd.Parameters.Add(p);
         }
+    }
 
-        using var insertCommand = conn.CreateCommand();
-        insertCommand.Transaction = transaction;
-        insertCommand.CommandText = @"
-            INSERT INTO SourceData (PeriodType, TimeFrom, TimeTo, HeatDemand, ElectricityPrice)
-            VALUES ($periodType, $timeFrom, $timeTo, $heatDemand, $electricityPrice);";
-
-        var periodType = insertCommand.CreateParameter();
-        periodType.ParameterName = "$periodType";
-        insertCommand.Parameters.Add(periodType);
-
-        var timeFrom = insertCommand.CreateParameter();
-        timeFrom.ParameterName = "$timeFrom";
-        insertCommand.Parameters.Add(timeFrom);
-
-        var timeTo = insertCommand.CreateParameter();
-        timeTo.ParameterName = "$timeTo";
-        insertCommand.Parameters.Add(timeTo);
-
-        var heatDemand = insertCommand.CreateParameter();
-        heatDemand.ParameterName = "$heatDemand";
-        insertCommand.Parameters.Add(heatDemand);
-
-        var electricityPrice = insertCommand.CreateParameter();
-        electricityPrice.ParameterName = "$electricityPrice";
-        insertCommand.Parameters.Add(electricityPrice);
-
-        foreach (var row in data)
-        {
-            periodType.Value = row.Period;
-            timeFrom.Value = row.TimeFrom;
-            timeTo.Value = row.TimeTo;
-            heatDemand.Value = row.HeatDemand;
-            electricityPrice.Value = DBNull.Value;
-            insertCommand.ExecuteNonQuery();
-        }
-
-        transaction.Commit();
+    private static void BindValues(SqliteCommand cmd, SourceData row)
+    {
+        cmd.Parameters["$periodType"].Value = row.Period;
+        cmd.Parameters["$timeFrom"].Value = row.TimeFrom;
+        cmd.Parameters["$timeTo"].Value = row.TimeTo;
+        cmd.Parameters["$heatDemand"].Value = row.HeatDemand;
+        cmd.Parameters["$electricityPrice"].Value = DBNull.Value;
     }
 }
